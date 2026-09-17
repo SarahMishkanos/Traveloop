@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Traveloop – My Itineraries</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #0a0c10;
+    --surface:   #111418;
+    --card:      #161b22;
+    --border:    #242a33;
+    --gold:      #d4a843;
+    --gold-soft: #c49332;
+    --teal:      #1fa688;
+    --teal-dim:  #14715c;
+    --coral:     #e05c4b;
+    --text:      #e8eaf0;
+    --muted:     #7a8494;
+    --accent:    #2a3240;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; opacity: .45;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(10,12,16,.85); backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    animation: slideDown .6s ease both;
+  }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; color: var(--gold); letter-spacing: -.02em; }
+  .nav-logo span { color: var(--teal); }
+  .nav-tabs { display: flex; gap: 6px; }
+  .nav-tab { padding: 8px 22px; border-radius: 100px; font-size: .85rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; color: var(--muted); transition: all .3s; background: none; }
+  .nav-tab.active, .nav-tab:hover { background: var(--accent); border-color: var(--border); color: var(--text); }
+  .nav-tab.active { color: var(--gold); border-color: var(--gold-soft); }
+
+  .hero { position: relative; overflow: hidden; height: 340px; display: flex; align-items: flex-end; padding: 48px; }
+  .hero-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #0d1a2a 0%, #0a1520 35%, #0c0f14 65%, #0a0c10 100%); }
+  .hero-map { position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 50%, rgba(31,166,136,.18) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(212,168,67,.12) 0%, transparent 45%), radial-gradient(circle at 50% 80%, rgba(224,92,75,.08) 0%, transparent 40%); animation: pulse 6s ease-in-out infinite alternate; }
+  .hero-dots { position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px); background-size: 28px 28px; }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-label { font-family: 'Caveat', cursive; color: var(--teal); font-size: 1.3rem; margin-bottom: 8px; animation: fadeUp .8s .2s ease both; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; line-height: 1.1; animation: fadeUp .8s .35s ease both; }
+  .hero-title em { color: var(--gold); font-style: normal; }
+
+  .float-city { position: absolute; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 8px 16px; font-size: .75rem; color: var(--muted); backdrop-filter: blur(8px); animation: floatBob 4s ease-in-out infinite alternate; }
+  .float-city:nth-child(1) { top: 60px; right: 18%; animation-delay: 0s; }
+  .float-city:nth-child(2) { top: 140px; right: 32%; animation-delay: 1.2s; }
+  .float-city:nth-child(3) { top: 80px; right: 7%; animation-delay: 2s; }
+  .float-city:nth-child(4) { top: 200px; right: 22%; animation-delay: .6s; }
+  .city-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); margin-right: 6px; }
+
+  .section { display: none; padding: 0; animation: sectionIn .45s ease both; }
+  .section.active { display: block; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 48px; }
+
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; }
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: #0a0c10; padding: 12px 28px; border-radius: 100px; font-weight: 600; font-size: .9rem; cursor: pointer; border: none; transition: all .3s; position: relative; overflow: hidden; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(212,168,67,.4); }
+
+  .trips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+  .trip-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; cursor: pointer; transition: transform .35s cubic-bezier(.22,.68,0,1.2), box-shadow .35s; animation: cardIn .5s ease both; }
+  .trip-card:hover { transform: translateY(-8px) scale(1.01); box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 0 1px var(--gold-soft); }
+  .trip-card-img-wrap { position: relative; overflow: hidden; }
+  .trip-card-img-wrap img { width: 100%; height: 190px; object-fit: cover; transition: transform .5s; }
+  .trip-card:hover .trip-card-img-wrap img { transform: scale(1.07); }
+  .trip-card-img-wrap::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,12,16,.85) 0%, transparent 60%); }
+  .trip-badge { position: absolute; top: 14px; left: 14px; z-index: 2; padding: 4px 12px; border-radius: 100px; font-size: .7rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+  .badge-upcoming { background: rgba(31,166,136,.25); color: var(--teal); border: 1px solid var(--teal-dim); }
+  .badge-past { background: rgba(122,132,148,.15); color: var(--muted); border: 1px solid var(--border); }
+  .badge-planning { background: rgba(212,168,67,.2); color: var(--gold); border: 1px solid var(--gold-soft); }
+  .trip-card-body { padding: 20px; }
+  .trip-card-name { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; }
+  .trip-meta { display: flex; gap: 16px; font-size: .8rem; color: var(--muted); margin-bottom: 16px; }
+  .trip-meta span { display: flex; align-items: center; gap: 5px; }
+  .trip-stops { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .stop-chip { background: var(--accent); border: 1px solid var(--border); padding: 3px 12px; border-radius: 100px; font-size: .75rem; color: var(--muted); transition: all .2s; }
+  .stop-chip:hover { border-color: var(--gold-soft); color: var(--gold); }
+  .trip-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
+  .trip-budget { font-weight: 600; color: var(--teal); font-size: .95rem; }
+  .trip-actions { display: flex; gap: 8px; }
+  .icon-btn { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border); background: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: .9rem; transition: all .2s; }
+  .icon-btn:hover { border-color: var(--gold-soft); color: var(--gold); transform: scale(1.1); }
+  .icon-btn.danger:hover { border-color: var(--coral); color: var(--coral); }
+  .trip-progress { margin-top: 12px; }
+  .progress-label { font-size: .72rem; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .progress-track { height: 4px; background: var(--accent); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--teal), var(--gold)); transition: width 1s cubic-bezier(.22,.68,0,1.2); }
+
+  /* BUILDER */
+  .builder-layout { display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
+  .builder-panel { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; position: sticky; top: 90px; }
+  .panel-head { padding: 22px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-weight: 600; font-size: 1rem; }
+  .add-stop-btn { background: var(--teal); color: #fff; border: none; padding: 8px 18px; border-radius: 100px; font-size: .8rem; font-weight: 600; cursor: pointer; transition: all .3s; display: flex; align-items: center; gap: 6px; }
+  .add-stop-btn:hover { background: #17876e; transform: scale(1.04); }
+  .stops-list { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .stop-item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; cursor: pointer; transition: all .3s; position: relative; animation: cardIn .4s ease both; }
+  .stop-item.selected, .stop-item:hover { border-color: var(--teal-dim); background: rgba(31,166,136,.07); }
+  .stop-item.selected { border-color: var(--teal); }
+  .stop-drag { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--border); font-size: 1.1rem; cursor: grab; }
+  .stop-num { width: 26px; height: 26px; border-radius: 50%; background: var(--teal); color: #fff; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; flex-shrink: 0; }
+  .stop-city { font-weight: 600; font-size: .95rem; margin-bottom: 4px; }
+  .stop-dates { font-size: .75rem; color: var(--muted); margin-bottom: 8px; }
+  .stop-activities-count { font-size: .72rem; background: var(--accent); display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; color: var(--muted); }
+  .connector { text-align: center; padding: 4px 0; }
+  .connector-dot { width: 1px; height: 20px; background: var(--border); margin: 0 auto; display: block; }
+  .builder-main { display: flex; flex-direction: column; gap: 20px; }
+  .city-header-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; animation: fadeUp .5s ease both; }
+  .city-hero { height: 200px; position: relative; background: linear-gradient(135deg, #0d2135, #132b20); display: flex; align-items: flex-end; padding: 24px; }
+  .city-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .5; }
+  .city-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,12,16,.9) 0%, transparent 60%); }
+  .city-hero-content { position: relative; z-index: 1; }
+  .city-name { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; line-height: 1; }
+  .city-country { color: var(--gold); font-size: .85rem; margin-top: 4px; }
+  .city-meta-row { display: flex; gap: 24px; padding: 18px 24px; border-bottom: 1px solid var(--border); }
+  .city-stat { text-align: center; }
+  .city-stat-val { font-weight: 700; font-size: 1.1rem; color: var(--gold); }
+  .city-stat-label { font-size: .7rem; color: var(--muted); }
+  .activities-section { padding: 20px 24px; }
+  .act-section-title { font-weight: 600; font-size: .9rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .act-filter { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-chip { padding: 5px 14px; border-radius: 100px; font-size: .75rem; cursor: pointer; border: 1px solid var(--border); background: var(--accent); color: var(--muted); transition: all .2s; }
+  .filter-chip.active, .filter-chip:hover { background: rgba(31,166,136,.15); border-color: var(--teal-dim); color: var(--teal); }
+  .activities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .activity-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: all .3s; animation: cardIn .4s ease both; }
+  .activity-card:hover { border-color: var(--gold-soft); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.4); }
+  .act-img-wrap { position: relative; overflow: hidden; }
+  .activity-card-img { width: 100%; height: 110px; object-fit: cover; display: block; transition: transform .4s; }
+  .activity-card:hover .activity-card-img { transform: scale(1.06); }
+  .act-cat-badge { position: absolute; bottom: 8px; left: 8px; font-size: .65rem; padding: 3px 9px; border-radius: 100px; font-weight: 600; backdrop-filter: blur(6px); background: rgba(10,12,16,.7); color: var(--text); border: 1px solid rgba(255,255,255,.12); }
+  .activity-card-body { padding: 12px; }
+  .activity-name { font-weight: 600; font-size: .85rem; margin-bottom: 4px; }
+  .act-desc { font-size: .75rem; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+  .act-detail-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .act-detail-pill { font-size: .65rem; padding: 2px 8px; border-radius: 100px; background: var(--accent); color: var(--muted); border: 1px solid var(--border); }
+  .activity-footer { display: flex; align-items: center; justify-content: space-between; }
+  .act-cost-wrap .activity-cost { font-size: .8rem; font-weight: 700; color: var(--teal); }
+  .act-cost-wrap .activity-duration { font-size: .7rem; color: var(--muted); }
+  .add-activity-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 4px 10px; font-size: .72rem; cursor: pointer; transition: all .2s; }
+  .add-activity-btn.added { background: rgba(31,166,136,.15); border-color: var(--teal-dim); color: var(--teal); }
+  .add-activity-btn:hover { border-color: var(--gold-soft); color: var(--gold); }
+
+  .timeline-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; animation: fadeUp .5s .1s ease both; }
+  .timeline-title { font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--teal), var(--gold), var(--teal)); opacity: .4; }
+  .timeline-item { position: relative; margin-bottom: 24px; animation: slideRight .4s ease both; }
+  .timeline-item::before { content: ''; position: absolute; left: -24px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); border: 2px solid var(--bg); box-shadow: 0 0 0 3px rgba(31,166,136,.25); }
+  .timeline-time { font-size: .72rem; color: var(--muted); margin-bottom: 4px; }
+  .timeline-event { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; transition: all .25s; }
+  .timeline-event:hover { border-color: var(--teal-dim); }
+  .timeline-event-name { font-weight: 600; font-size: .88rem; margin-bottom: 2px; }
+  .timeline-event-meta { font-size: .75rem; color: var(--muted); }
+  .timeline-cost { font-size: .8rem; color: var(--gold); font-weight: 600; }
+
+  .budget-bar { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; animation: fadeUp .5s .2s ease both; }
+  .budget-total { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold); font-weight: 700; }
+  .budget-breakdown { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .budget-item { flex: 1; min-width: 100px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center; }
+  .budget-item-val { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+  .budget-item-label { font-size: .7rem; color: var(--muted); }
+  .budget-item.transport .budget-item-val { color: var(--teal); }
+  .budget-item.stay .budget-item-val { color: var(--gold); }
+  .budget-item.activities .budget-item-val { color: #a78bfa; }
+  .budget-item.meals .budget-item-val { color: var(--coral); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.7); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; animation: fadeIn .25s ease; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 36px; width: 100%; max-width: 520px; animation: modalIn .35s cubic-bezier(.22,.68,0,1.2) both; }
+  .modal h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 24px; }
+  .form-group { margin-bottom: 18px; }
+  .form-label { font-size: .8rem; color: var(--muted); margin-bottom: 8px; display: block; font-weight: 500; }
+  .form-input, .form-select { width: 100%; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: inherit; font-size: .9rem; transition: border-color .2s; outline: none; }
+  .form-input:focus, .form-select:focus { border-color: var(--teal); }
+  .form-select option { background: var(--surface); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .modal-footer { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
+  .btn-ghost { padding: 11px 24px; border-radius: 100px; border: 1px solid var(--border); background: none; color: var(--muted); font-family: inherit; cursor: pointer; font-size: .88rem; transition: all .2s; }
+  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+
+  .view-toggle { display: flex; gap: 4px; background: var(--accent); border-radius: 100px; padding: 4px; }
+  .view-btn { padding: 6px 18px; border-radius: 100px; font-size: .8rem; cursor: pointer; border: none; background: none; color: var(--muted); transition: all .25s; }
+  .view-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+
+  .toast-container { position: fixed; bottom: 32px; right: 32px; z-index: 300; display: flex; flex-direction: column; gap: 10px; }
+  .toast { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; font-size: .88rem; min-width: 260px; box-shadow: 0 12px 40px rgba(0,0,0,.5); animation: toastIn .4s cubic-bezier(.22,.68,0,1.2) both; }
+  .toast.success .toast-icon { color: var(--teal); }
+  .toast.warning .toast-icon { color: var(--gold); }
+  .toast-icon { font-size: 1.2rem; }
+  .toast-out { animation: toastOut .3s ease forwards; }
+
+  .search-wrap { position: relative; margin-bottom: 24px; }
+  .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 1rem; pointer-events: none; }
+  .search-input { width: 100%; padding: 13px 16px 13px 44px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: var(--text); font-family: inherit; font-size: .9rem; outline: none; transition: border-color .2s, box-shadow .2s; }
+  .search-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31,166,136,.12); }
+
+  .stats-row { display: flex; gap: 16px; margin-bottom: 32px; }
+  .stat-card { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; animation: cardIn .4s ease both; transition: transform .3s, box-shadow .3s; }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.4); }
+  .stat-card-val { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+  .stat-card-label { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+  .stat-card:nth-child(1) .stat-card-val { color: var(--gold); }
+  .stat-card:nth-child(2) .stat-card-val { color: var(--teal); }
+  .stat-card:nth-child(3) .stat-card-val { color: #a78bfa; }
+  .reorder-hint { text-align: center; padding: 10px 16px; font-size: .72rem; color: var(--muted); border-top: 1px solid var(--border); }
+
+  @keyframes slideDown  { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeUp     { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeIn     { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes sectionIn  { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes cardIn     { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes modalIn    { from { opacity: 0; transform: scale(.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  @keyframes toastIn    { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastOut   { to { opacity: 0; transform: translateX(60px); } }
+  @keyframes floatBob   { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+  @keyframes pulse      { from { opacity: .7; } to { opacity: 1; } }
+  .trip-card.deleting { animation: cardOut .4s ease forwards; }
+  @keyframes cardOut { to { opacity: 0; transform: scale(.9); } }
+
+  @media (max-width: 900px) {
+    .builder-layout { grid-template-columns: 1fr; }
+    .builder-panel { position: static; }
+    nav { padding: 14px 20px; }
+    .container { padding: 28px 20px; }
+    .stats-row { flex-wrap: wrap; }
+    .hero { padding: 28px 20px; }
+    .float-city { display: none; }
+    .activities-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---- completions: activity cards, timeline content, misc states ---- */
+  .act-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: border-color .2s, transform .2s; animation: cardIn .4s ease both; }
+  .act-card:hover { border-color: var(--teal-dim); transform: translateY(-2px); }
+  .act-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
+  .act-card-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .act-card-name { font-weight: 700; font-size: .9rem; }
+  .act-card-desc { font-size: .76rem; color: var(--muted); line-height: 1.4; }
+  .act-card-meta { display: flex; justify-content: space-between; align-items: center; font-size: .72rem; color: var(--muted); margin-top: 4px; }
+  .act-card-cost { color: var(--gold); font-weight: 700; }
+  .act-add-btn { border: 1px solid var(--teal-dim); background: transparent; color: var(--teal); border-radius: 100px; padding: 5px 12px; font-size: .72rem; cursor: pointer; transition: all .2s; }
+  .act-add-btn.added { background: var(--teal); color: #06231d; border-color: var(--teal); }
+  .timeline-day { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+  .timeline-name { font-weight: 700; font-size: .88rem; }
+  .timeline-meta { font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; margin-top: 2px; }
+  .timeline-cost { color: var(--gold); font-weight: 700; }
+  .trip-card.hidden { display: none; }
+  .trip-card.removing { animation: cardOut .3s ease forwards; }
+  @keyframes cardOut { to { opacity: 0; transform: scale(.92); } }
+  .empty-state { text-align:center; padding: 40px 20px; color: var(--muted); font-size: .85rem; }
+
+  /* ---- My Itineraries specific: status tabs, view-only badges ---- */
+  .status-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+  .status-tab { padding: 7px 16px; border-radius: 100px; font-size: .78rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--accent); color: var(--muted); transition: all .2s; }
+  .status-tab.active, .status-tab:hover { background: rgba(212,168,67,.15); border-color: var(--gold-soft); color: var(--gold); }
+  .view-only-tag { font-size: .72rem; padding: 6px 12px; border-radius: 100px; background: rgba(31,166,136,.12); border: 1px solid var(--teal-dim); color: var(--teal); font-weight: 600; }
+  .act-status-badge { align-self: flex-start; font-size: .7rem; padding: 4px 10px; border-radius: 100px; background: var(--accent); color: var(--muted); border: 1px solid var(--border); }
+  .act-status-badge.included { background: rgba(31,166,136,.15); color: var(--teal); border-color: var(--teal-dim); }
+</style>
+<link rel="stylesheet" href="css/traveloop.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Travel<span>oop</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab" onclick="window.location.href='main2.html'">✈ Home</button>
+    <button class="nav-tab active">📁 My Itineraries</button>
+    <button class="nav-tab" onclick="window.location.href='itnbuilder.html'">🗺 Itinerary Builder</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-map"></div>
+  <div class="hero-dots"></div>
+  <div class="float-city"><span class="city-dot"></span>Delhi, India</div>
+
+  <div class="hero-content">
+    <div class="hero-label">✦ All Your Trips, One Place</div>
+    <h1 class="hero-title">Your saved<br/><em>itineraries.</em></h1>
+  </div>
+</div>
+
+<!-- MY TRIPS -->
+<section id="trips" class="section active">
+<div class="container">
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-card-val" id="tripCount">4</div><div class="stat-card-label">🧳 Total Trips</div></div>
+    <div class="stat-card"><div class="stat-card-val">18</div><div class="stat-card-label">🏙 Cities Visited</div></div>
+    <div class="stat-card"><div class="stat-card-val">₹15.2L</div><div class="stat-card-label">💸 Total Budget</div></div>
+  </div>
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">My Itineraries</h2>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:4px;">Browse, share or duplicate your saved trips</p>
+    </div>
+    <button class="btn-primary" onclick="window.location.href='itnbuilder.html'">🗺 Open Builder</button>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" placeholder="Search trips by destination or name…" oninput="filterTrips(this.value)"/>
+  </div>
+  <div class="status-tabs" id="statusTabs">
+    <span class="status-tab active" onclick="filterStatus(this,'all')">All</span>
+    <span class="status-tab" onclick="filterStatus(this,'badge-upcoming')">🟢 Upcoming</span>
+    <span class="status-tab" onclick="filterStatus(this,'badge-planning')">🟡 Planning</span>
+    <span class="status-tab" onclick="filterStatus(this,'badge-past')">⚪ Past</span>
+  </div>
+
+  <div class="trips-grid" id="tripsGrid">
+
+    <div class="trip-card" data-name="Japan Cultural Tour" onclick="viewItinerary('Japan Cultural Tour')">
+      <div class="trip-card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80" alt="Japan"/>
+        <span class="trip-badge badge-upcoming">Upcoming</span>
+      </div>
+      <div class="trip-card-body">
+        <div class="trip-card-name">Japan Cultural Tour</div>
+        <div class="trip-meta"><span>📅 Jun 12 – Jun 28, 2026</span><span>🌆 4 cities</span></div>
+        <div class="trip-stops">
+          <span class="stop-chip">Tokyo</span><span class="stop-chip">Kyoto</span><span class="stop-chip">Osaka</span><span class="stop-chip">Nara</span>
+        </div>
+        <div class="trip-progress">
+          <div class="progress-label"><span>Planning progress</span><span>72%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:72%"></div></div>
+        </div>
+        <div class="trip-card-footer">
+          <span class="trip-budget">₹2,70,000 est.</span>
+          <div class="trip-actions">
+            <div class="icon-btn" title="Duplicate" onclick="event.stopPropagation();duplicateCard(this,'Japan Cultural Tour')">📋</div>
+            <div class="icon-btn" title="Share" onclick="event.stopPropagation();shareItinerary('Japan Cultural Tour')">🔗</div>
+            <div class="icon-btn danger" title="Delete" onclick="event.stopPropagation();deleteCard(this)">🗑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trip-card" data-name="European Grand Tour" onclick="viewItinerary('European Grand Tour')">
+      <div class="trip-card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80" alt="Paris"/>
+        <span class="trip-badge badge-planning">Planning</span>
+      </div>
+      <div class="trip-card-body">
+        <div class="trip-card-name">European Grand Tour</div>
+        <div class="trip-meta"><span>📅 Sep 1 – Sep 18, 2026</span><span>🌆 5 cities</span></div>
+        <div class="trip-stops">
+          <span class="stop-chip">Paris</span><span class="stop-chip">Rome</span><span class="stop-chip">Barcelona</span><span class="stop-chip">Amsterdam</span><span class="stop-chip">+1</span>
+        </div>
+        <div class="trip-progress">
+          <div class="progress-label"><span>Planning progress</span><span>38%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:38%"></div></div>
+        </div>
+        <div class="trip-card-footer">
+          <span class="trip-budget">₹4,05,000 est.</span>
+          <div class="trip-actions">
+            <div class="icon-btn" title="Duplicate" onclick="event.stopPropagation();duplicateCard(this,'European Grand Tour')">📋</div>
+            <div class="icon-btn" title="Share" onclick="event.stopPropagation();shareItinerary('European Grand Tour')">🔗</div>
+            <div class="icon-btn danger" title="Delete" onclick="event.stopPropagation();deleteCard(this)">🗑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trip-card" data-name="Bali Retreat" onclick="viewItinerary('Bali Retreat')">
+      <div class="trip-card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80" alt="Bali"/>
+        <span class="trip-badge badge-past">Past</span>
+      </div>
+      <div class="trip-card-body">
+        <div class="trip-card-name">Bali Retreat</div>
+        <div class="trip-meta"><span>📅 Feb 5 – Feb 15, 2026</span><span>🌆 3 cities</span></div>
+        <div class="trip-stops">
+          <span class="stop-chip">Ubud</span><span class="stop-chip">Seminyak</span><span class="stop-chip">Canggu</span>
+        </div>
+        <div class="trip-progress">
+          <div class="progress-label"><span>Completed</span><span>100%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+        </div>
+        <div class="trip-card-footer">
+          <span class="trip-budget">₹1,77,000 spent</span>
+          <div class="trip-actions">
+            <div class="icon-btn" title="Duplicate" onclick="event.stopPropagation();duplicateCard(this,'Bali Retreat')">📋</div>
+            <div class="icon-btn" title="Share" onclick="event.stopPropagation();shareItinerary('Bali Retreat')">🔗</div>
+            <div class="icon-btn danger" title="Delete" onclick="event.stopPropagation();deleteCard(this)">🗑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trip-card" data-name="USA Road Trip" onclick="viewItinerary('USA Road Trip')">
+      <div class="trip-card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=600&q=80" alt="USA"/>
+        <span class="trip-badge badge-planning">Planning</span>
+      </div>
+      <div class="trip-card-body">
+        <div class="trip-card-name">USA Road Trip</div>
+        <div class="trip-meta"><span>📅 Dec 20, 2026 – Jan 5, 2027</span><span>🌆 4 cities</span></div>
+        <div class="trip-stops">
+          <span class="stop-chip">New York</span><span class="stop-chip">Chicago</span><span class="stop-chip">Las Vegas</span><span class="stop-chip">LA</span>
+        </div>
+        <div class="trip-progress">
+          <div class="progress-label"><span>Planning progress</span><span>15%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:15%"></div></div>
+        </div>
+        <div class="trip-card-footer">
+          <span class="trip-budget">₹4,65,000 est.</span>
+          <div class="trip-actions">
+            <div class="icon-btn" title="Duplicate" onclick="event.stopPropagation();duplicateCard(this,'USA Road Trip')">📋</div>
+            <div class="icon-btn" title="Share" onclick="event.stopPropagation();shareItinerary('USA Road Trip')">🔗</div>
+            <div class="icon-btn danger" title="Delete" onclick="event.stopPropagation();deleteCard(this)">🗑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ITINERARY BUILDER -->
+<section id="builder" class="section">
+<div class="container">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title" id="builderTripName">Japan Cultural Tour</h2>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:4px;" id="builderSubtitle">Jun 12 – Jun 28, 2026 · 4 stops</p>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <span class="view-only-tag">👁 Viewing</span>
+      <button class="btn-primary" onclick="shareItinerary(document.getElementById('builderTripName').textContent)">🔗 Share</button>
+    </div>
+  </div>
+
+  <div id="listView">
+  <div class="builder-layout">
+
+    <!-- Stops Panel -->
+    <div>
+      <div class="builder-panel">
+        <div class="panel-head">
+          <span class="panel-title" id="stopsLabel">🗺 Route (4)</span>
+        </div>
+        <div class="stops-list" id="stopsList"></div>
+        <div class="reorder-hint">Tap a stop to view its details</div>
+      </div>
+    </div>
+
+    <!-- City Detail -->
+    <div class="builder-main">
+      <div class="city-header-card" id="cityCard">
+        <div class="city-hero">
+          <img id="cityImg" src="" alt="City"/>
+          <div class="city-hero-overlay"></div>
+          <div class="city-hero-content">
+            <div class="city-name" id="cityName"></div>
+            <div class="city-country" id="cityCountry"></div>
+          </div>
+        </div>
+        <div class="city-meta-row">
+          <div class="city-stat"><div class="city-stat-val" id="cityCost">$$$</div><div class="city-stat-label">Cost Index</div></div>
+          <div class="city-stat"><div class="city-stat-val" id="cityRating">⭐ 4.9</div><div class="city-stat-label">Popularity</div></div>
+          <div class="city-stat"><div class="city-stat-val" id="cityNights">3 nights</div><div class="city-stat-label">Duration</div></div>
+          <div class="city-stat"><div class="city-stat-val" id="cityTemp">22°C</div><div class="city-stat-label">Avg Temp</div></div>
+        </div>
+        <div class="activities-section">
+          <div class="act-section-title">
+            <span>🎯 Activities</span>
+            <span style="font-size:.75rem;color:var(--muted);font-weight:400;" id="actCount"></span>
+          </div>
+          <div class="act-filter" id="actFilter">
+            <span class="filter-chip active" onclick="filterAct(this,'all')">🌐 All</span>
+            <span class="filter-chip" onclick="filterAct(this,'sightseeing')">🏛 Sightseeing</span>
+            <span class="filter-chip" onclick="filterAct(this,'food')">🍽 Food & Drink</span>
+            <span class="filter-chip" onclick="filterAct(this,'culture')">🎭 Culture</span>
+            <span class="filter-chip" onclick="filterAct(this,'adventure')">🧗 Adventure</span>
+            <span class="filter-chip" onclick="filterAct(this,'nature')">🌿 Nature</span>
+            <span class="filter-chip" onclick="filterAct(this,'nightlife')">🌙 Nightlife</span>
+            <span class="filter-chip" onclick="filterAct(this,'shopping')">🛍 Shopping</span>
+          </div>
+          <div class="activities-grid" id="activitiesGrid"></div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline-card">
+        <div class="timeline-title">📋 Day-by-Day Timeline <span style="font-size:.75rem;color:var(--muted);font-weight:400;" id="timelineCity"></span></div>
+        <div class="timeline" id="timeline"></div>
+      </div>
+
+      <!-- Budget -->
+      <div class="budget-bar" id="budgetBar">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div>
+            <div style="font-size:.8rem;color:var(--muted);">Total Estimated Budget</div>
+            <div class="budget-total" id="budgetTotal"></div>
+          </div>
+          <div style="font-size:.8rem;color:var(--muted);text-align:right;">
+            <div>Daily avg</div>
+            <div style="color:var(--teal);font-weight:700;font-size:1rem;" id="budgetDaily"></div>
+          </div>
+        </div>
+        <div class="budget-breakdown" id="budgetBreakdown"></div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+</div>
+</section>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  function deleteCard(button) {
+    // Find the main trip card
+    const card = button.closest('.trip-card');
+
+    // Add delete animation
+    card.classList.add('deleting');
+
+    // Remove after animation
+    setTimeout(() => {
+      card.remove();
+
+      // Update trip count
+      const tripCount = document.querySelectorAll('.trip-card').length;
+      document.getElementById('tripCount').textContent = tripCount;
+
+      // Optional toast message
+      showToast('Trip removed successfully!', 'warning');
+    }, 400);
+  }
+
+  // Simple toast function
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    toast.innerHTML = `
+      <span class="toast-icon">
+        ${type === 'success' ? '✅' : '⚠️'}
+      </span>
+      <span>${message}</span>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('toast-out');
+
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 2500);
+  }
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  ALL TOUR DATA
+// ═══════════════════════════════════════════════════════
+const TOURS = {
+
+  'Japan Cultural Tour': {
+    subtitle: 'Jun 12 – Jun 28, 2026 · 4 stops',
+    budget: { total:'₹2,70,000', daily:'₹16,900/day', transport:'₹71,000', stay:'₹1,01,000', activities:'₹54,000', meals:'₹44,000' },
+    stops: [
+      { city:'Tokyo', flag:'🇯🇵', country:'Japan', dates:'Jun 12 – Jun 15, 2026', nights:'3 nights', actCount:'8 activities', color:'var(--teal)' },
+      { city:'Kyoto', flag:'🇯🇵', country:'Japan', dates:'Jun 15 – Jun 19, 2026', nights:'4 nights', actCount:'7 activities', color:'var(--gold)' },
+      { city:'Osaka', flag:'🇯🇵', country:'Japan', dates:'Jun 19 – Jun 23, 2026', nights:'4 nights', actCount:'6 activities', color:'#a78bfa' },
+      { city:'Nara', flag:'🇯🇵', country:'Japan', dates:'Jun 23 – Jun 28, 2026', nights:'5 nights', actCount:'4 activities', color:'var(--coral)' }
+    ],
+    cities: {
+      Tokyo: {
+        img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80',
+        country: '🇯🇵 Japan · Jun 12 – Jun 15, 2026', cost:'$$$', rating:'⭐ 4.9', nights:'3 nights', temp:'22°C',
+        activities: [
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=400&q=80', name:'Shibuya Crossing', desc:"World's busiest pedestrian crossing — iconic at night with neon lights.", time:'9:00 AM – 11:00 AM', dur:'2 hrs', cost:'Free', booking:'No booking required', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=80', name:'Senso-ji Temple', desc:"Tokyo's oldest Buddhist temple in Asakusa. Walk the Nakamise market street.", time:'7:00 AM – 10:00 AM', dur:'3 hrs', cost:'Free', booking:'Open daily', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80', name:'Tsukiji Food Tour', desc:'Guided walk through Tsukiji Outer Market — fresh sushi, tamagoyaki & matcha.', time:'8:00 AM – 11:00 AM', dur:'3 hrs', cost:'₹3,800', booking:'Pre-booking needed', added:false },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=400&q=80', name:'Mt. Fuji Day Trip', desc:'Full-day excursion to Japan\'s iconic peak. Bus from Shinjuku to 5th station.', time:'6:00 AM – 7:00 PM', dur:'Full day', cost:'₹6,700', booking:'Guided tour', added:false },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1601042879364-f3947d3f9c16?w=400&q=80', name:'teamLab Borderless', desc:'World-famous immersive digital art museum with mind-bending light installations.', time:'2:00 PM – 5:00 PM', dur:'3 hrs', cost:'₹2,900', booking:'Book in advance', added:true },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&q=80', name:'Shinjuku Golden Gai', desc:'A maze of 200+ tiny bars — each seats 5–10 people. Raw Tokyo night culture.', time:'8:00 PM – 11:30 PM', dur:'3.5 hrs', cost:'₹1,500', booking:'Walk-in friendly', added:true },
+          { cat:'nature', img:'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=400&q=80', name:'Ueno Park & Zoo', desc:"Tokyo's most famous park with museums, shrines, a lake & panda exhibits.", time:'10:00 AM – 1:00 PM', dur:'3 hrs', cost:'₹1,100', booking:'Zoo entry fee', added:false },
+          { cat:'shopping', img:'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400&q=80', name:'Akihabara Electronics', desc:"Tokyo's famous tech & anime district with multi-floor stores, manga cafés & arcades.", time:'3:00 PM – 7:00 PM', dur:'4 hrs', cost:'Varies', booking:'Free entry', added:false }
+        ],
+        timeline: [
+          { day:'Day 1 · Jun 12, 2026 · Morning', name:'✈ Arrive at Narita Airport', meta:'Flight · Check in hotel · 10:00 AM', cost:'₹18,500' },
+          { day:'Day 1 · Jun 12, 2026 · Afternoon', name:'🏯 Shibuya Crossing', meta:'Sightseeing · 2 hrs · 3:00 PM', cost:'Free' },
+          { day:'Day 1 · Jun 12, 2026 · Evening', name:'🌙 Shinjuku Golden Gai', meta:'Nightlife · 3.5 hrs · 8:00 PM', cost:'₹1,500' },
+          { day:'Day 2 · Jun 13, 2026 · Morning', name:'⛩ Senso-ji Temple', meta:'Culture · 3 hrs · 7:00 AM', cost:'Free' },
+          { day:'Day 2 · Jun 13, 2026 · Afternoon', name:'🎭 teamLab Borderless', meta:'Culture · 3 hrs · 2:00 PM', cost:'₹2,900' },
+          { day:'Day 3 · Jun 14, 2026 · All Day', name:'🗻 Mt. Fuji Day Trip', meta:'Adventure · Full day · 6:00 AM', cost:'₹6,700' }
+        ]
+      },
+      Kyoto: {
+        img: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
+        country: '🇯🇵 Japan · Jun 15 – Jun 19, 2026', cost:'$$', rating:'⭐ 4.8', nights:'4 nights', temp:'24°C',
+        activities: [
+          { cat:'culture', img:'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=400&q=80', name:'Fushimi Inari Shrine', desc:'Famous thousands-of-torii-gates trail up Mount Inari. Hike takes 2–3 hours.', time:'6:00 AM – 9:00 AM', dur:'3 hrs', cost:'Free', booking:'Open 24 hrs', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=80', name:'Arashiyama Bamboo Grove', desc:'Walk through towering bamboo stalks in Arashiyama. Best visited at sunrise.', time:'6:30 AM – 8:30 AM', dur:'2 hrs', cost:'Free', booking:'No booking needed', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1542931287-023b922fa89b?w=400&q=80', name:'Kinkaku-ji Golden Pavilion', desc:'UNESCO World Heritage zen temple coated in gold leaf, reflected in a mirror pond.', time:'9:00 AM – 11:00 AM', dur:'2 hrs', cost:'₹550', booking:'Tickets at gate', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80', name:'Nishiki Market Walk', desc:"Kyoto's 400-year-old covered market — tofu, pickles, wagashi sweets & dashi broth.", time:'10:00 AM – 12:00 PM', dur:'2 hrs', cost:'₹1,200', booking:'Walk-in', added:false },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=80', name:'Geisha District (Gion)', desc:'Historic geisha district of wooden machiya townhouses. Evening stroll to spot maiko.', time:'6:00 PM – 9:00 PM', dur:'3 hrs', cost:'Free', booking:'No booking needed', added:true },
+          { cat:'nature', img:'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=400&q=80', name:'Philosopher\'s Path', desc:"Cherry-tree-lined canal walk connecting Nanzen-ji to Ginkaku-ji Silver Pavilion.", time:'8:00 AM – 10:00 AM', dur:'2 hrs', cost:'Free', booking:'Walk anytime', added:false },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=400&q=80', name:'Tea Ceremony Experience', desc:'Traditional Urasenke tea ceremony with matcha & wagashi in a 200-year-old tea house.', time:'2:00 PM – 4:00 PM', dur:'2 hrs', cost:'₹3,200', booking:'Pre-booking required', added:false }
+        ],
+        timeline: [
+          { day:'Day 4 · Jun 15, 2026 · Morning', name:'🚄 Arrive from Tokyo (Shinkansen)', meta:'Bullet Train · 2.5 hrs', cost:'₹5,800' },
+          { day:'Day 4 · Jun 15, 2026 · Afternoon', name:'⛩ Fushimi Inari Shrine', meta:'Culture · 3 hrs · 2:00 PM', cost:'Free' },
+          { day:'Day 5 · Jun 16, 2026 · Morning', name:'🎋 Arashiyama Bamboo Grove', meta:'Sightseeing · 2 hrs · 6:30 AM', cost:'Free' },
+          { day:'Day 5 · Jun 16, 2026 · Afternoon', name:'🏯 Kinkaku-ji Golden Pavilion', meta:'Culture · 2 hrs · 9:00 AM', cost:'₹550' },
+          { day:'Day 6 · Jun 17, 2026 · Morning', name:'🛒 Nishiki Market Walk', meta:'Food · 2 hrs · 10:00 AM', cost:'₹1,200' },
+          { day:'Day 6 · Jun 17, 2026 · Evening', name:'🏮 Gion Geisha District', meta:'Culture · 3 hrs · 6:00 PM', cost:'Free' }
+        ]
+      },
+      Osaka: {
+        img: 'https://images.unsplash.com/photo-1589452271712-64b8a66c7b71?w=800&q=80',
+        country: '🇯🇵 Japan · Jun 19 – Jun 23, 2026', cost:'$$', rating:'⭐ 4.7', nights:'4 nights', temp:'25°C',
+        activities: [
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1589452271712-64b8a66c7b71?w=400&q=80', name:'Osaka Castle', desc:'16th-century castle surrounded by a moat and cherry blossom park. Museum inside.', time:'9:00 AM – 12:00 PM', dur:'3 hrs', cost:'₹730', booking:'Tickets at entrance', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80', name:'Dotonbori Street Food', desc:"Osaka's famous neon-lit food street — takoyaki, okonomiyaki & kushikatsu.", time:'6:00 PM – 9:00 PM', dur:'3 hrs', cost:'₹2,000', booking:'Walk-in', added:true },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80', name:'Universal Studios Japan', desc:'Full-day theme park with Harry Potter World, Nintendo World & Jurassic Park.', time:'9:00 AM – 9:00 PM', dur:'Full day', cost:'₹7,500', booking:'Book online', added:false },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=80', name:'Shitennoji Temple', desc:"Japan's oldest temple, founded in 593 AD. Serene gardens and impressive pagoda.", time:'8:00 AM – 10:00 AM', dur:'2 hrs', cost:'₹400', booking:'Open daily', added:false },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&q=80', name:'Namba Nightlife', desc:'Vibrant Namba district with rooftop bars, izakayas, jazz clubs & late-night ramen.', time:'8:00 PM – 12:00 AM', dur:'4 hrs', cost:'₹2,500', booking:'Walk-in', added:true },
+          { cat:'shopping', img:'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400&q=80', name:'Shinsaibashi Shopping', desc:'1km covered shopping arcade — luxury brands to quirky Japanese souvenirs.', time:'2:00 PM – 6:00 PM', dur:'4 hrs', cost:'Varies', booking:'Free entry', added:false }
+        ],
+        timeline: [
+          { day:'Day 8 · Jun 19, 2026 · Morning', name:'🚄 Arrive from Kyoto', meta:'Train · 15 min · Check in', cost:'₹800' },
+          { day:'Day 8 · Jun 19, 2026 · Afternoon', name:'🏯 Osaka Castle', meta:'Sightseeing · 3 hrs · 9:00 AM', cost:'₹730' },
+          { day:'Day 8 · Jun 19, 2026 · Evening', name:'🍢 Dotonbori Street Food', meta:'Food & Drink · 3 hrs · 6:00 PM', cost:'₹2,000' },
+          { day:'Day 9 · Jun 20, 2026 · All Day', name:'🎢 Universal Studios Japan', meta:'Adventure · Full day · 9:00 AM', cost:'₹7,500' },
+          { day:'Day 10 · Jun 21, 2026 · Evening', name:'🌙 Namba Nightlife', meta:'Nightlife · 4 hrs · 8:00 PM', cost:'₹2,500' }
+        ]
+      },
+      Nara: {
+        img: 'https://images.unsplash.com/photo-1576675784201-0e142b423952?w=800&q=80',
+        country: '🇯🇵 Japan · Jun 23 – Jun 28, 2026', cost:'$', rating:'⭐ 4.6', nights:'5 nights', temp:'23°C',
+        activities: [
+          { cat:'nature', img:'https://images.unsplash.com/photo-1576675784201-0e142b423952?w=400&q=80', name:'Feed the Sacred Deer', desc:'Over 1,200 freely roaming deer considered sacred messengers of the gods. Buy shika-senbei crackers.', time:'9:00 AM – 11:00 AM', dur:'2 hrs', cost:'₹200', booking:'Walk-in', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=80', name:'Todai-ji Great Buddha', desc:'World\'s largest bronze Buddha statue (15m tall) inside the world\'s largest wooden building.', time:'7:30 AM – 10:00 AM', dur:'2.5 hrs', cost:'₹660', booking:'Tickets at gate', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=80', name:'Kasuga Taisha Shrine', desc:'Ancient Shinto shrine famous for its 3,000 stone and bronze lanterns lit during festivals.', time:'10:00 AM – 12:00 PM', dur:'2 hrs', cost:'₹550', booking:'Open daily', added:true },
+          { cat:'nature', img:'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=400&q=80', name:'Yoshikien Garden', desc:'Three distinct garden styles — pond garden, moss garden & tea ceremony garden.', time:'9:00 AM – 11:00 AM', dur:'2 hrs', cost:'Free', booking:'Free for foreigners', added:false }
+        ],
+        timeline: [
+          { day:'Day 12 · Jun 23, 2026 · Morning', name:'🚌 Arrive from Osaka', meta:'Bus · 1 hr · Check in', cost:'₹600' },
+          { day:'Day 12 · Jun 23, 2026 · Morning', name:'🦌 Feed the Sacred Deer', meta:'Nature · 2 hrs · 9:00 AM', cost:'₹200' },
+          { day:'Day 12 · Jun 23, 2026 · Afternoon', name:'🏛 Todai-ji Great Buddha', meta:'Culture · 2.5 hrs · 1:00 PM', cost:'₹660' },
+          { day:'Day 13 · Jun 24, 2026 · Morning', name:'⛩ Kasuga Taisha Shrine', meta:'Sightseeing · 2 hrs · 10:00 AM', cost:'₹550' },
+          { day:'Day 14 · Jun 25, 2026 · Morning', name:'🌿 Yoshikien Garden', meta:'Nature · 2 hrs · 9:00 AM', cost:'Free' }
+        ]
+      }
+    }
+  },
+
+  'European Grand Tour': {
+    subtitle: 'Sep 1 – Sep 18, 2026 · 5 stops',
+    budget: { total:'₹4,05,000', daily:'₹22,500/day', transport:'₹1,20,000', stay:'₹1,60,000', activities:'₹65,000', meals:'₹60,000' },
+    stops: [
+      { city:'Paris', flag:'🇫🇷', country:'France', dates:'Sep 1 – Sep 4, 2026', nights:'3 nights', actCount:'8 activities', color:'var(--teal)' },
+      { city:'Rome', flag:'🇮🇹', country:'Italy', dates:'Sep 4 – Sep 7, 2026', nights:'3 nights', actCount:'8 activities', color:'var(--gold)' },
+      { city:'Barcelona', flag:'🇪🇸', country:'Spain', dates:'Sep 7 – Sep 11, 2026', nights:'4 nights', actCount:'7 activities', color:'#a78bfa' },
+      { city:'Amsterdam', flag:'🇳🇱', country:'Netherlands', dates:'Sep 11 – Sep 14, 2026', nights:'3 nights', actCount:'6 activities', color:'var(--coral)' },
+      { city:'Prague', flag:'🇨🇿', country:'Czech Republic', dates:'Sep 14 – Sep 18, 2026', nights:'4 nights', actCount:'5 activities', color:'#34d399' }
+    ],
+    cities: {
+      Paris: {
+        img: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800&q=80',
+        country: '🇫🇷 France · Sep 1 – Sep 4, 2026', cost:'$$$$', rating:'⭐ 4.9', nights:'3 nights', temp:'19°C',
+        activities: [
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=400&q=80', name:'Eiffel Tower', desc:'Climb to the 2nd floor for panoramic views or book a table at the tower restaurant.', time:'9:00 AM – 12:00 PM', dur:'3 hrs', cost:'₹1,800', booking:'Book online', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1544413660-299165566b1d?w=400&q=80', name:'Louvre Museum', desc:"World's largest art museum — home to the Mona Lisa, Venus de Milo & 35,000 artworks.", time:'9:00 AM – 1:00 PM', dur:'4 hrs', cost:'₹1,400', booking:'Book in advance', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1478641300939-0ec5188d3802?w=400&q=80', name:'Notre-Dame Cathedral', desc:'Gothic masterpiece and the heart of Paris. Currently being restored after 2019 fire.', time:'10:00 AM – 12:00 PM', dur:'2 hrs', cost:'Free', booking:'Timed entry', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', name:'Le Marais Food Walk', desc:'Guided tour through the Jewish quarter — falafel, croissants, macarons & wine tasting.', time:'11:00 AM – 2:00 PM', dur:'3 hrs', cost:'₹3,500', booking:'Pre-book needed', added:false },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1551009175-15bdf9dcb580?w=400&q=80', name:'Musée d\'Orsay', desc:'Impressionist masterpieces by Monet, Renoir & Van Gogh housed in a former railway station.', time:'9:30 AM – 1:00 PM', dur:'3.5 hrs', cost:'₹1,400', booking:'Book online', added:false },
+          { cat:'nature', img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80', name:'Seine River Cruise', desc:'1-hour illuminated evening cruise past Notre-Dame, Eiffel Tower & Louvre from Pont de l\'Alma.', time:'8:00 PM – 9:15 PM', dur:'1.25 hrs', cost:'₹1,200', booking:'Book ahead', added:true },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1551009175-15bdf9dcb580?w=400&q=80', name:'Versailles Day Trip', desc:'Day trip to the opulent Palace of Versailles and its 800-hectare gardens.', time:'9:00 AM – 5:00 PM', dur:'Full day', cost:'₹4,200', booking:'Pre-book required', added:false },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&q=80', name:'Montmartre Night Walk', desc:'Bohemian hilltop village after dark — Sacré-Coeur lit up, cabarets & street artists.', time:'7:00 PM – 10:00 PM', dur:'3 hrs', cost:'Free', booking:'Walk-in', added:false }
+        ],
+        timeline: [
+          { day:'Day 1 · Sep 1, 2026 · Morning', name:'✈ Arrive Charles de Gaulle Airport', meta:'Flight · Check in hotel · 10:00 AM', cost:'₹35,000' },
+          { day:'Day 1 · Sep 1, 2026 · Afternoon', name:'🗼 Eiffel Tower', meta:'Sightseeing · 3 hrs · 2:00 PM', cost:'₹1,800' },
+          { day:'Day 1 · Sep 1, 2026 · Evening', name:'🚢 Seine River Cruise', meta:'Nature · 1.25 hrs · 8:00 PM', cost:'₹1,200' },
+          { day:'Day 2 · Sep 2, 2026 · Morning', name:'🖼 Louvre Museum', meta:'Culture · 4 hrs · 9:00 AM', cost:'₹1,400' },
+          { day:'Day 2 · Sep 2, 2026 · Afternoon', name:'⛪ Notre-Dame Cathedral', meta:'Sightseeing · 2 hrs · 2:00 PM', cost:'Free' },
+          { day:'Day 3 · Sep 3, 2026 · All Day', name:'🏰 Versailles Day Trip', meta:'Adventure · Full day · 9:00 AM', cost:'₹4,200' }
+        ]
+      },
+      Rome: {
+        img: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80',
+        country: '🇮🇹 Italy · Sep 4 – Sep 7, 2026', cost:'$$$', rating:'⭐ 4.8', nights:'3 nights', temp:'25°C',
+        activities: [
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&q=80', name:'Colosseum Tour', desc:'Ancient amphitheatre that once held 80,000 spectators. Skip-the-line guided tour inside.', time:'9:00 AM – 12:00 PM', dur:'3 hrs', cost:'₹2,800', booking:'Book in advance', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=400&q=80', name:'Vatican Museums & Sistine Chapel', desc:"Michelangelo's breathtaking Sistine Chapel ceiling inside the world's smallest country.", time:'8:00 AM – 1:00 PM', dur:'5 hrs', cost:'₹2,100', booking:'Must pre-book', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=400&q=80', name:'Trevi Fountain', desc:'Baroque masterpiece — toss a coin to guarantee return to Rome. Best at dawn.', time:'7:00 AM – 8:00 AM', dur:'1 hr', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', name:'Trastevere Food Tour', desc:'Evening walk through medieval Trastevere — cacio e pepe, supplì, gelato & local wine.', time:'6:00 PM – 9:00 PM', dur:'3 hrs', cost:'₹3,200', booking:'Pre-book needed', added:false },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?w=400&q=80', name:'Roman Forum & Palatine Hill', desc:"Walk the ruins of ancient Rome's civic centre — temples, arches & the Via Sacra.", time:'9:00 AM – 12:00 PM', dur:'3 hrs', cost:'₹2,800', booking:'Included with Colosseum', added:false },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1583418855532-04be8f1e6f28?w=400&q=80', name:'Vespa Tour of Rome', desc:'2-hour guided Vespa scooter ride past all major monuments — a quintessentially Roman experience.', time:'4:00 PM – 6:00 PM', dur:'2 hrs', cost:'₹4,500', booking:'Pre-booking required', added:false },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&q=80', name:'Campo de\' Fiori Evening', desc:'Lively piazza transforming from a morning market to Rome\'s biggest open-air bar scene.', time:'8:00 PM – 11:00 PM', dur:'3 hrs', cost:'₹2,000', booking:'Walk-in', added:false },
+          { cat:'nature', img:'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&q=80', name:'Borghese Gallery & Gardens', desc:"Bernini sculptures in a Baroque villa surrounded by Rome's most beautiful park.", time:'9:00 AM – 11:00 AM', dur:'2 hrs', cost:'₹1,600', booking:'Reservations required', added:false }
+        ],
+        timeline: [
+          { day:'Day 4 · Sep 4, 2026 · Morning', name:'✈ Fly Paris → Rome', meta:'Flight · 2 hrs · Check in', cost:'₹8,500' },
+          { day:'Day 4 · Sep 4, 2026 · Afternoon', name:'🏛 Colosseum Tour', meta:'Sightseeing · 3 hrs · 2:00 PM', cost:'₹2,800' },
+          { day:'Day 5 · Sep 5, 2026 · Morning', name:'🌅 Trevi Fountain at Dawn', meta:'Sightseeing · 1 hr · 7:00 AM', cost:'Free' },
+          { day:'Day 5 · Sep 5, 2026 · Morning', name:'🎨 Vatican Museums & Sistine Chapel', meta:'Culture · 5 hrs · 8:00 AM', cost:'₹2,100' },
+          { day:'Day 5 · Sep 5, 2026 · Evening', name:'🍝 Trastevere Food Tour', meta:'Food · 3 hrs · 6:00 PM', cost:'₹3,200' },
+          { day:'Day 6 · Sep 6, 2026 · Afternoon', name:'🛵 Vespa Tour of Rome', meta:'Adventure · 2 hrs · 4:00 PM', cost:'₹4,500' }
+        ]
+      },
+      Barcelona: {
+        img: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80',
+        country: '🇪🇸 Spain · Sep 7 – Sep 11, 2026', cost:'$$$', rating:'⭐ 4.8', nights:'4 nights', temp:'27°C',
+        activities: [
+          { cat:'culture', img:'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&q=80', name:'Sagrada Família', desc:"Gaudí's unfinished basilica — a UNESCO site under construction since 1882. Towers offer city views.", time:'9:00 AM – 12:00 PM', dur:'3 hrs', cost:'₹2,500', booking:'Book 6 weeks ahead', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', name:'Park Güell', desc:"Gaudí's whimsical hilltop park with mosaic terraces, gingerbread gatehouses & city panoramas.", time:'8:00 AM – 11:00 AM', dur:'3 hrs', cost:'₹1,200', booking:'Timed tickets required', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', name:'La Boqueria Market', desc:"Barcelona's iconic covered market — jamón ibérico, fresh seafood, frutas & tapas bars.", time:'9:00 AM – 11:00 AM', dur:'2 hrs', cost:'₹1,500', booking:'Walk-in', added:true },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?w=400&q=80', name:'Barceloneta Beach', desc:'City beach on the Mediterranean — swim, paddleboard or enjoy chiringuito beach bars.', time:'10:00 AM – 3:00 PM', dur:'5 hrs', cost:'Free', booking:'No booking', added:false },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=80', name:'El Born Tapas Crawl', desc:'Hop through El Born neighbourhood\'s tapas bars — patatas bravas, croquetas & cava.', time:'8:00 PM – 12:00 AM', dur:'4 hrs', cost:'₹3,000', booking:'Walk-in', added:false },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&q=80', name:'Casa Batlló', desc:"Gaudí's fantastical apartment building — the interior feels like being inside a dragon.", time:'9:00 AM – 12:00 PM', dur:'3 hrs', cost:'₹3,500', booking:'Book in advance', added:false },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', name:'Las Ramblas Stroll', desc:"Barcelona's famous 1.2km pedestrian boulevard — street performers, flower stalls & café terraces.", time:'6:00 PM – 8:00 PM', dur:'2 hrs', cost:'Free', booking:'Walk-in', added:false }
+        ],
+        timeline: [
+          { day:'Day 7 · Sep 7, 2026 · Morning', name:'✈ Fly Rome → Barcelona', meta:'Flight · 2.5 hrs · Check in', cost:'₹7,500' },
+          { day:'Day 7 · Sep 7, 2026 · Afternoon', name:'⛪ Sagrada Família', meta:'Culture · 3 hrs · 2:00 PM', cost:'₹2,500' },
+          { day:'Day 8 · Sep 8, 2026 · Morning', name:'🌈 Park Güell', meta:'Sightseeing · 3 hrs · 8:00 AM', cost:'₹1,200' },
+          { day:'Day 8 · Sep 8, 2026 · Afternoon', name:'🥩 La Boqueria Market', meta:'Food · 2 hrs · 11:00 AM', cost:'₹1,500' },
+          { day:'Day 9 · Sep 9, 2026 · All Day', name:'🏖 Barceloneta Beach', meta:'Adventure · 5 hrs · 10:00 AM', cost:'Free' },
+          { day:'Day 10 · Sep 10, 2026 · Evening', name:'🍷 El Born Tapas Crawl', meta:'Nightlife · 4 hrs · 8:00 PM', cost:'₹3,000' }
+        ]
+      },
+      Amsterdam: {
+        img: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=800&q=80',
+        country: '🇳🇱 Netherlands · Sep 11 – Sep 14, 2026', cost:'$$$$', rating:'⭐ 4.7', nights:'3 nights', temp:'17°C',
+        activities: [
+          { cat:'culture', img:'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=400&q=80', name:'Anne Frank House', desc:"Anne Frank's wartime hiding place — deeply moving museum in the actual secret annex.", time:'9:00 AM – 11:30 AM', dur:'2.5 hrs', cost:'₹1,300', booking:'Must book 2 months ahead', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1530039910046-8e895a5e2100?w=400&q=80', name:'Rijksmuseum', desc:"Holland's national museum — Rembrandt's Night Watch & Vermeer's masterpieces.", time:'9:00 AM – 1:00 PM', dur:'4 hrs', cost:'₹1,900', booking:'Book online', added:true },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1504567961542-e24d9439a724?w=400&q=80', name:'Canal Bike Tour', desc:'Pedal through Amsterdam\'s UNESCO canals on a guided bike tour past 17th-century gables.', time:'10:00 AM – 1:00 PM', dur:'3 hrs', cost:'₹2,400', booking:'Pre-book', added:true },
+          { cat:'nature', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', name:'Keukenhof Day Trip', desc:'If in spring, the world\'s largest flower garden — 7 million tulips. Sep has dahlia season.', time:'9:00 AM – 5:00 PM', dur:'Full day', cost:'₹2,200', booking:'Book ahead', added:false },
+          { cat:'food', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', name:'Jordaan Food Tour', desc:'Walk Amsterdam\'s most charming neighbourhood — herring, stroopwafels, cheese & jenever gin.', time:'11:00 AM – 2:00 PM', dur:'3 hrs', cost:'₹2,800', booking:'Pre-book', added:false },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&q=80', name:'Leidseplein Bar Hopping', desc:"Amsterdam's main nightlife square — Dutch breweries, live music venues & outdoor terraces.", time:'8:00 PM – 12:00 AM', dur:'4 hrs', cost:'₹2,500', booking:'Walk-in', added:false }
+        ],
+        timeline: [
+          { day:'Day 11 · Sep 11, 2026 · Morning', name:'✈ Fly Barcelona → Amsterdam', meta:'Flight · 2 hrs · Check in', cost:'₹8,000' },
+          { day:'Day 11 · Sep 11, 2026 · Afternoon', name:'📔 Anne Frank House', meta:'Culture · 2.5 hrs · 2:00 PM', cost:'₹1,300' },
+          { day:'Day 12 · Sep 12, 2026 · Morning', name:'🚲 Canal Bike Tour', meta:'Adventure · 3 hrs · 10:00 AM', cost:'₹2,400' },
+          { day:'Day 12 · Sep 12, 2026 · Afternoon', name:'🖼 Rijksmuseum', meta:'Culture · 4 hrs · 1:00 PM', cost:'₹1,900' },
+          { day:'Day 13 · Sep 13, 2026 · Afternoon', name:'🧀 Jordaan Food Tour', meta:'Food · 3 hrs · 11:00 AM', cost:'₹2,800' }
+        ]
+      },
+      Prague: {
+        img: 'https://images.unsplash.com/photo-1519677584237-752f8853252e?w=800&q=80',
+        country: '🇨🇿 Czech Republic · Sep 14 – Sep 18, 2026', cost:'$$', rating:'⭐ 4.8', nights:'4 nights', temp:'16°C',
+        activities: [
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1519677584237-752f8853252e?w=400&q=80', name:'Prague Castle Complex', desc:"One of the world's largest castle complexes — Gothic St Vitus Cathedral & panoramic views over the city.", time:'9:00 AM – 1:00 PM', dur:'4 hrs', cost:'₹1,400', booking:'Tickets at gate', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1541849546-216549ae216d?w=400&q=80', name:'Charles Bridge at Sunrise', desc:'14th-century stone bridge lined with 30 baroque statues. Magical before the crowds arrive.', time:'6:00 AM – 7:30 AM', dur:'1.5 hrs', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1519677584237-752f8853252e?w=400&q=80', name:'Old Town Astronomical Clock', desc:'Medieval astronomical clock that performs a show every hour — in Old Town Square since 1410.', time:'12:00 PM – 12:30 PM', dur:'30 min', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', name:'Czech Beer & Food Tour', desc:'Sample svíčková, trdelník & tankové pivo in historic U Fleků brewery — Czech cuisine at its finest.', time:'6:00 PM – 9:00 PM', dur:'3 hrs', cost:'₹2,500', booking:'Pre-book', added:false },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&q=80', name:'Jazz Club Reduta', desc:"Europe's oldest jazz club — Dizzy Gillespie played here. Intimate basement venue with nightly jazz.", time:'9:00 PM – 12:00 AM', dur:'3 hrs', cost:'₹1,800', booking:'Book ahead', added:false }
+        ],
+        timeline: [
+          { day:'Day 14 · Sep 14, 2026 · Morning', name:'✈ Fly Amsterdam → Prague', meta:'Flight · 1.5 hrs · Check in', cost:'₹6,500' },
+          { day:'Day 14 · Sep 14, 2026 · Afternoon', name:'🌅 Charles Bridge at Sunset', meta:'Sightseeing · 1.5 hrs · 6:00 PM', cost:'Free' },
+          { day:'Day 15 · Sep 15, 2026 · Morning', name:'🏰 Prague Castle Complex', meta:'Sightseeing · 4 hrs · 9:00 AM', cost:'₹1,400' },
+          { day:'Day 15 · Sep 15, 2026 · Afternoon', name:'🕰 Astronomical Clock', meta:'Culture · 30 min · 12:00 PM', cost:'Free' },
+          { day:'Day 16 · Sep 16, 2026 · Evening', name:'🎺 Jazz Club Reduta', meta:'Nightlife · 3 hrs · 9:00 PM', cost:'₹1,800' }
+        ]
+      }
+    }
+  },
+
+  'Bali Retreat': {
+    subtitle: 'Feb 5 – Feb 15, 2026 · 3 stops',
+    budget: { total:'₹1,77,000', daily:'₹17,700/day', transport:'₹42,000', stay:'₹58,000', activities:'₹45,000', meals:'₹32,000' },
+    stops: [
+      { city:'Ubud', flag:'🇮🇩', country:'Indonesia', dates:'Feb 5 – Feb 9, 2026', nights:'4 nights', actCount:'5 activities', color:'var(--teal)' },
+      { city:'Seminyak', flag:'🇮🇩', country:'Indonesia', dates:'Feb 9 – Feb 12, 2026', nights:'3 nights', actCount:'5 activities', color:'var(--gold)' },
+      { city:'Canggu', flag:'🇮🇩', country:'Indonesia', dates:'Feb 12 – Feb 15, 2026', nights:'3 nights', actCount:'4 activities', color:'#a78bfa' }
+    ],
+    cities: {
+      Ubud: {
+        img: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=800&q=80',
+        country: '🇮🇩 Indonesia · Feb 5 – Feb 9, 2026', cost:'$$', rating:'⭐ 4.9', nights:'4 nights', temp:'28°C',
+        activities: [
+          { cat:'nature', img:'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=400&q=80', name:'Tegalalang Rice Terrace', desc:'Iconic emerald rice paddies stepping down the hillside — best visited at sunrise.', time:'6:30 AM – 8:30 AM', dur:'2 hrs', cost:'₹250', booking:'Small entry donation', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=400&q=80', name:'Sacred Monkey Forest', desc:'Nature reserve and Hindu temple complex home to hundreds of long-tailed macaques.', time:'9:00 AM – 11:00 AM', dur:'2 hrs', cost:'₹350', booking:'Tickets at gate', added:true },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1573790387438-4da905039392?w=400&q=80', name:'Campuhan Ridge Walk', desc:'Easy scenic ridge trail through grassy hills just outside central Ubud.', time:'7:00 AM – 8:30 AM', dur:'1.5 hrs', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&q=80', name:'Balinese Cooking Class', desc:'Market visit followed by a hands-on cooking class making traditional Balinese dishes.', time:'9:00 AM – 1:00 PM', dur:'4 hrs', cost:'₹2,600', booking:'Pre-book', added:false },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=400&q=80', name:'Tirta Empul Water Temple', desc:'Holy spring temple where locals and visitors take part in a ritual purification bath.', time:'8:00 AM – 10:00 AM', dur:'2 hrs', cost:'₹400', booking:'Sarong provided at gate', added:false }
+        ],
+        timeline: [
+          { day:'Day 1 · Feb 5, 2026 · Morning', name:'✈ Arrive Ngurah Rai Airport', meta:'Flight · Transfer to Ubud · 10:00 AM', cost:'₹12,000' },
+          { day:'Day 1 · Feb 5, 2026 · Afternoon', name:'🌾 Campuhan Ridge Walk', meta:'Adventure · 1.5 hrs · 4:00 PM', cost:'Free' },
+          { day:'Day 2 · Feb 6, 2026 · Morning', name:'🌄 Tegalalang Rice Terrace', meta:'Nature · 2 hrs · 6:30 AM', cost:'₹250' },
+          { day:'Day 2 · Feb 6, 2026 · Afternoon', name:'🐒 Sacred Monkey Forest', meta:'Culture · 2 hrs · 9:00 AM', cost:'₹350' },
+          { day:'Day 3 · Feb 7, 2026 · Morning', name:'🍛 Balinese Cooking Class', meta:'Food · 4 hrs · 9:00 AM', cost:'₹2,600' }
+        ]
+      },
+      Seminyak: {
+        img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80',
+        country: '🇮🇩 Indonesia · Feb 9 – Feb 12, 2026', cost:'$$$', rating:'⭐ 4.7', nights:'3 nights', temp:'29°C',
+        activities: [
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=400&q=80', name:'Seminyak Beach Surf Lesson', desc:'Beginner-friendly surf lesson on Seminyak\'s golden-sand beach break.', time:'7:00 AM – 9:00 AM', dur:'2 hrs', cost:'₹2,200', booking:'Pre-book', added:true },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&q=80', name:'Sunset Beach Club', desc:'Iconic beachfront club for cocktails and live DJ sets as the sun goes down.', time:'5:00 PM – 8:00 PM', dur:'3 hrs', cost:'₹1,800', booking:'Table reservation recommended', added:true },
+          { cat:'shopping', img:'https://images.unsplash.com/photo-1555529771-7888783a18d3?w=400&q=80', name:'Seminyak Boutique Strip', desc:'Designer boutiques and homeware stores lining Jalan Kayu Aya.', time:'11:00 AM – 2:00 PM', dur:'3 hrs', cost:'Varies', booking:'Free entry', added:false },
+          { cat:'food', img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80', name:'Warung Food Crawl', desc:'Sample nasi campur, satay and sambal at three local warungs.', time:'12:00 PM – 3:00 PM', dur:'3 hrs', cost:'₹1,200', booking:'Walk-in', added:true }
+        ],
+        timeline: [
+          { day:'Day 4 · Feb 9, 2026 · Morning', name:'🏄 Seminyak Beach Surf Lesson', meta:'Adventure · 2 hrs · 7:00 AM', cost:'₹2,200' },
+          { day:'Day 4 · Feb 9, 2026 · Evening', name:'🌇 Sunset Beach Club', meta:'Nightlife · 3 hrs · 5:00 PM', cost:'₹1,800' },
+          { day:'Day 5 · Feb 10, 2026 · Afternoon', name:'🛍 Seminyak Boutique Strip', meta:'Shopping · 3 hrs · 11:00 AM', cost:'Varies' }
+        ]
+      },
+      Canggu: {
+        img: 'https://images.unsplash.com/photo-1512100356356-de1b84283e18?w=800&q=80',
+        country: '🇮🇩 Indonesia · Feb 12 – Feb 15, 2026', cost:'$$', rating:'⭐ 4.8', nights:'3 nights', temp:'29°C',
+        activities: [
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=400&q=80', name:'Canggu Surf & Skate', desc:'Rent a board or join a group surf session at Batu Bolong beach break.', time:'6:30 AM – 9:00 AM', dur:'2.5 hrs', cost:'₹1,600', booking:'Walk-in', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=400&q=80', name:'Tanah Lot Sunset Temple', desc:'Sea temple perched on a rock formation — dramatic silhouette at sunset.', time:'5:00 PM – 7:00 PM', dur:'2 hrs', cost:'₹500', booking:'Tickets at gate', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80', name:'Canggu Café Hop', desc:'Brunch through Canggu\'s famous coffee and smoothie-bowl café scene.', time:'9:00 AM – 12:00 PM', dur:'3 hrs', cost:'₹1,400', booking:'Walk-in', added:false },
+          { cat:'nature', img:'https://images.unsplash.com/photo-1518544866330-4d5d0e9c4d9c?w=400&q=80', name:'Rice Field Cycling Tour', desc:'Guided bike ride through Canggu\'s backroads and working rice paddies.', time:'7:00 AM – 10:00 AM', dur:'3 hrs', cost:'₹1,900', booking:'Pre-book', added:false }
+        ],
+        timeline: [
+          { day:'Day 8 · Feb 12, 2026 · Morning', name:'🏄 Canggu Surf & Skate', meta:'Adventure · 2.5 hrs · 6:30 AM', cost:'₹1,600' },
+          { day:'Day 8 · Feb 12, 2026 · Evening', name:'🌅 Tanah Lot Sunset Temple', meta:'Culture · 2 hrs · 5:00 PM', cost:'₹500' },
+          { day:'Day 9 · Feb 13, 2026 · Morning', name:'🚲 Rice Field Cycling Tour', meta:'Nature · 3 hrs · 7:00 AM', cost:'₹1,900' }
+        ]
+      }
+    }
+  },
+
+  'USA Road Trip': {
+    subtitle: 'Dec 20, 2026 – Jan 5, 2027 · 4 stops',
+    budget: { total:'₹4,65,000', daily:'₹29,000/day', transport:'₹1,40,000', stay:'₹1,55,000', activities:'₹90,000', meals:'₹80,000' },
+    stops: [
+      { city:'New York', flag:'🇺🇸', country:'USA', dates:'Dec 20 – Dec 24, 2026', nights:'4 nights', actCount:'6 activities', color:'var(--teal)' },
+      { city:'Chicago', flag:'🇺🇸', country:'USA', dates:'Dec 24 – Dec 27, 2026', nights:'3 nights', actCount:'5 activities', color:'var(--gold)' },
+      { city:'Las Vegas', flag:'🇺🇸', country:'USA', dates:'Dec 27 – Dec 31, 2026', nights:'4 nights', actCount:'5 activities', color:'#a78bfa' },
+      { city:'LA', flag:'🇺🇸', country:'USA', dates:'Dec 31, 2026 – Jan 5, 2027', nights:'5 nights', actCount:'6 activities', color:'var(--coral)' }
+    ],
+    cities: {
+      'New York': {
+        img: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80',
+        country: '🇺🇸 USA · Dec 20 – Dec 24, 2026', cost:'$$$$', rating:'⭐ 4.8', nights:'4 nights', temp:'2°C',
+        activities: [
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1522083165195-3424ed129620?w=400&q=80', name:'Empire State Building', desc:'Art Deco icon with sweeping views from the 86th-floor observation deck.', time:'10:00 AM – 12:00 PM', dur:'2 hrs', cost:'₹2,600', booking:'Book online', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&q=80', name:'Metropolitan Museum of Art', desc:'One of the world\'s largest art museums spanning 5,000 years of culture.', time:'10:00 AM – 2:00 PM', dur:'4 hrs', cost:'₹2,200', booking:'Pay-what-you-wish for NY residents', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=400&q=80', name:'Central Park Walk', desc:'843-acre park in the heart of Manhattan — perfect for a winter stroll.', time:'9:00 AM – 11:00 AM', dur:'2 hrs', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=400&q=80', name:'Times Square at Night', desc:'Neon-lit heart of the city — especially festive during the holiday season.', time:'7:00 PM – 9:00 PM', dur:'2 hrs', cost:'Free', booking:'Walk-in', added:false },
+          { cat:'food', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', name:'Brooklyn Food Tour', desc:'Pizza, bagels and speakeasy cocktails through Williamsburg and DUMBO.', time:'12:00 PM – 3:00 PM', dur:'3 hrs', cost:'₹3,800', booking:'Pre-book', added:false }
+        ],
+        timeline: [
+          { day:'Day 1 · Dec 20, 2026 · Morning', name:'✈ Arrive JFK Airport', meta:'Flight · Check in hotel · 9:00 AM', cost:'₹1,10,000' },
+          { day:'Day 1 · Dec 20, 2026 · Afternoon', name:'🏙 Empire State Building', meta:'Sightseeing · 2 hrs · 2:00 PM', cost:'₹2,600' },
+          { day:'Day 2 · Dec 21, 2026 · Morning', name:'🌳 Central Park Walk', meta:'Sightseeing · 2 hrs · 9:00 AM', cost:'Free' },
+          { day:'Day 2 · Dec 21, 2026 · Afternoon', name:'🖼 Metropolitan Museum of Art', meta:'Culture · 4 hrs · 10:00 AM', cost:'₹2,200' },
+          { day:'Day 3 · Dec 22, 2026 · Evening', name:'🌆 Times Square at Night', meta:'Nightlife · 2 hrs · 7:00 PM', cost:'Free' }
+        ]
+      },
+      Chicago: {
+        img: 'https://images.unsplash.com/photo-1494522358652-f30e61a60313?w=800&q=80',
+        country: '🇺🇸 USA · Dec 24 – Dec 27, 2026', cost:'$$$', rating:'⭐ 4.7', nights:'3 nights', temp:'-3°C',
+        activities: [
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1494522358652-f30e61a60313?w=400&q=80', name:'Millennium Park & The Bean', desc:'Chicago\'s public art hub, home to the reflective Cloud Gate sculpture.', time:'10:00 AM – 12:00 PM', dur:'2 hrs', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=400&q=80', name:'Art Institute of Chicago', desc:'World-class collection including Impressionist and American masterpieces.', time:'10:00 AM – 1:00 PM', dur:'3 hrs', cost:'₹1,900', booking:'Book online', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1522083165195-3424ed129620?w=400&q=80', name:'Skydeck Willis Tower', desc:'Glass-floor ledge 103 stories above the Chicago skyline.', time:'2:00 PM – 3:30 PM', dur:'1.5 hrs', cost:'₹2,400', booking:'Book in advance', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80', name:'Deep-Dish Pizza Tour', desc:'Sample Chicago\'s legendary deep-dish pizza at three historic pizzerias.', time:'6:00 PM – 9:00 PM', dur:'3 hrs', cost:'₹2,300', booking:'Walk-in', added:false }
+        ],
+        timeline: [
+          { day:'Day 4 · Dec 24, 2026 · Morning', name:'✈ Fly New York → Chicago', meta:'Flight · 2.5 hrs · Check in', cost:'₹14,500' },
+          { day:'Day 4 · Dec 24, 2026 · Afternoon', name:'🫘 Millennium Park & The Bean', meta:'Sightseeing · 2 hrs · 2:00 PM', cost:'Free' },
+          { day:'Day 5 · Dec 25, 2026 · Morning', name:'🖼 Art Institute of Chicago', meta:'Culture · 3 hrs · 10:00 AM', cost:'₹1,900' },
+          { day:'Day 5 · Dec 25, 2026 · Afternoon', name:'🏙 Skydeck Willis Tower', meta:'Sightseeing · 1.5 hrs · 2:00 PM', cost:'₹2,400' }
+        ]
+      },
+      'Las Vegas': {
+        img: 'https://images.unsplash.com/photo-1581351721010-8cf859cb14a4?w=800&q=80',
+        country: '🇺🇸 USA · Dec 27 – Dec 31, 2026', cost:'$$$', rating:'⭐ 4.6', nights:'4 nights', temp:'12°C',
+        activities: [
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1605833556294-ea5c7a74f57d?w=400&q=80', name:'The Strip at Night', desc:'Walk the neon-lit Las Vegas Boulevard past fountains, casinos and lights.', time:'8:00 PM – 11:00 PM', dur:'3 hrs', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1581351721010-8cf859cb14a4?w=400&q=80', name:'Bellagio Fountains', desc:'Choreographed water, light and music show on the Bellagio\'s lake.', time:'7:00 PM – 7:30 PM', dur:'30 min', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1517824806704-9040b037703b?w=400&q=80', name:'Grand Canyon Day Trip', desc:'Full-day excursion to the South Rim, including a helicopter option.', time:'6:00 AM – 6:00 PM', dur:'Full day', cost:'₹18,000', booking:'Book ahead', added:true },
+          { cat:'food', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', name:'Vegas Buffet Crawl', desc:'Sample two of the Strip\'s legendary all-you-can-eat buffets.', time:'12:00 PM – 3:00 PM', dur:'3 hrs', cost:'₹4,500', booking:'Reservation recommended', added:false }
+        ],
+        timeline: [
+          { day:'Day 8 · Dec 27, 2026 · Morning', name:'✈ Fly Chicago → Las Vegas', meta:'Flight · 4 hrs · Check in', cost:'₹16,000' },
+          { day:'Day 8 · Dec 27, 2026 · Evening', name:'⛲ Bellagio Fountains', meta:'Sightseeing · 30 min · 7:00 PM', cost:'Free' },
+          { day:'Day 9 · Dec 28, 2026 · All Day', name:'🏜 Grand Canyon Day Trip', meta:'Adventure · Full day · 6:00 AM', cost:'₹18,000' },
+          { day:'Day 10 · Dec 29, 2026 · Evening', name:'🎰 The Strip at Night', meta:'Nightlife · 3 hrs · 8:00 PM', cost:'Free' }
+        ]
+      },
+      LA: {
+        img: 'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=800&q=80',
+        country: '🇺🇸 USA · Dec 31, 2026 – Jan 5, 2027', cost:'$$$$', rating:'⭐ 4.7', nights:'5 nights', temp:'18°C',
+        activities: [
+          { cat:'sightseeing', img:'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=400&q=80', name:'Hollywood Walk of Fame', desc:'Stroll past thousands of stars honouring entertainment icons.', time:'10:00 AM – 12:00 PM', dur:'2 hrs', cost:'Free', booking:'Walk-in', added:true },
+          { cat:'nature', img:'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400&q=80', name:'Griffith Observatory', desc:'Panoramic views of LA and the Hollywood sign, plus free planetarium shows.', time:'4:00 PM – 6:30 PM', dur:'2.5 hrs', cost:'Free', booking:'Book planetarium slot', added:true },
+          { cat:'adventure', img:'https://images.unsplash.com/photo-1503803548695-c2a7b4a5b875?w=400&q=80', name:'Santa Monica Pier', desc:'Classic beachfront pier with an amusement park and ocean views.', time:'2:00 PM – 5:00 PM', dur:'3 hrs', cost:'₹1,200', booking:'Walk-in', added:true },
+          { cat:'nightlife', img:'https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=400&q=80', name:'New Year\'s Eve on the Pier', desc:'Fireworks and live music to ring in the new year at Santa Monica.', time:'9:00 PM – 12:30 AM', dur:'3.5 hrs', cost:'₹2,000', booking:'Arrive early', added:true },
+          { cat:'culture', img:'https://images.unsplash.com/photo-1518533296742-c04863e7f5b3?w=400&q=80', name:'Getty Center', desc:'Hilltop museum and gardens with a striking modern-art collection, free entry.', time:'10:00 AM – 1:00 PM', dur:'3 hrs', cost:'Free parking fee only', booking:'Reserve timed entry', added:false }
+        ],
+        timeline: [
+          { day:'Day 12 · Dec 31, 2026 · Morning', name:'✈ Fly Las Vegas → LA', meta:'Flight · 1 hr · Check in', cost:'₹9,000' },
+          { day:'Day 12 · Dec 31, 2026 · Afternoon', name:'⭐ Hollywood Walk of Fame', meta:'Sightseeing · 2 hrs · 11:00 AM', cost:'Free' },
+          { day:'Day 12 · Dec 31, 2026 · Evening', name:'🎆 New Year\'s Eve on the Pier', meta:'Nightlife · 3.5 hrs · 9:00 PM', cost:'₹2,000' },
+          { day:'Day 13 · Jan 1, 2027 · Afternoon', name:'🌅 Griffith Observatory', meta:'Nature · 2.5 hrs · 4:00 PM', cost:'Free' },
+          { day:'Day 14 · Jan 2, 2027 · Afternoon', name:'🎡 Santa Monica Pier', meta:'Adventure · 3 hrs · 2:00 PM', cost:'₹1,200' }
+        ]
+      }
+    }
+  }
+
+};
+
+/* ================= APPLICATION LOGIC ================= */
+/* Note: showToast() and deleteCard() are already defined above this
+   block with this page's own trip-count-aware behavior — not redefined here. */
+let currentTrip = null;
+let currentCity = null;
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function money(str) {
+  const n = parseInt(String(str).replace(/[^0-9]/g, ''), 10);
+  return isNaN(n) ? 0 : n;
+}
+
+function renderCity(tripName, cityName) {
+  const trip = TOURS[tripName];
+  if (!trip) return;
+  const city = trip.cities[cityName];
+  if (!city) return;
+  currentTrip = tripName;
+  currentCity = cityName;
+
+  document.getElementById('cityImg').src = city.img;
+  document.getElementById('cityName').textContent = cityName;
+  document.getElementById('cityCountry').textContent = city.country;
+  document.getElementById('cityCost').textContent = city.cost;
+  document.getElementById('cityRating').textContent = city.rating;
+  document.getElementById('cityNights').textContent = city.nights;
+  document.getElementById('cityTemp').textContent = city.temp;
+  document.getElementById('actCount').textContent = city.activities.length + ' activities';
+  document.getElementById('timelineCity').textContent = '· ' + cityName;
+
+  renderActivities(city.activities, 'all');
+
+  const timelineBox = document.getElementById('timeline');
+  timelineBox.innerHTML = city.timeline.map(item => (
+    '<div class="timeline-item">' +
+      '<div class="timeline-day">' + item.day + '</div>' +
+      '<div class="timeline-name">' + item.name + '</div>' +
+      '<div class="timeline-meta"><span>' + item.meta + '</span><span class="timeline-cost">' + item.cost + '</span></div>' +
+    '</div>'
+  )).join('');
+
+  document.querySelectorAll('.stop-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.city === cityName);
+  });
+
+  renderBudget(trip.budget);
+}
+
+function renderActivities(activities, filter) {
+  const grid = document.getElementById('activitiesGrid');
+  const list = filter === 'all' ? activities : activities.filter(a => a.cat === filter);
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state">No activities in this category yet.</div>';
+    return;
+  }
+  grid.innerHTML = list.map(a => (
+    '<div class="act-card">' +
+      '<img src="' + a.img + '" alt="' + a.name + '" loading="lazy">' +
+      '<div class="act-card-body">' +
+        '<div class="act-card-name">' + a.name + '</div>' +
+        '<div class="act-card-desc">' + a.desc + '</div>' +
+        '<div class="act-card-meta"><span>' + a.time + ' · ' + a.dur + '</span><span class="act-card-cost">' + a.cost + '</span></div>' +
+        '<span class="act-status-badge' + (a.added ? ' included' : '') + '">' + (a.added ? '✓ In itinerary' : 'Not included') + '</span>' +
+      '</div>' +
+    '</div>'
+  )).join('');
+}
+
+function renderBudget(budget) {
+  document.getElementById('budgetTotal').textContent = budget.total;
+  document.getElementById('budgetDaily').textContent = budget.daily;
+  const box = document.getElementById('budgetBreakdown');
+  box.innerHTML =
+    '<div class="budget-item transport"><div class="budget-item-val">' + budget.transport + '</div><div class="budget-item-label">✈ Transport</div></div>' +
+    '<div class="budget-item stay"><div class="budget-item-val">' + budget.stay + '</div><div class="budget-item-label">🏨 Stay</div></div>' +
+    '<div class="budget-item activities"><div class="budget-item-val">' + budget.activities + '</div><div class="budget-item-label">🎯 Activities</div></div>' +
+    '<div class="budget-item meals"><div class="budget-item-val">' + budget.meals + '</div><div class="budget-item-label">🍽 Meals</div></div>';
+}
+
+function viewItinerary(tripName) {
+  const trip = TOURS[tripName];
+  if (!trip) { showToast('No details found for this trip yet.', 'warning'); return; }
+
+  document.getElementById('builderTripName').textContent = tripName;
+  document.getElementById('builderSubtitle').textContent = trip.subtitle;
+  document.getElementById('stopsLabel').textContent = '🗺 Route (' + trip.stops.length + ')';
+
+  const stopsList = document.getElementById('stopsList');
+  stopsList.innerHTML = trip.stops.map((s, i) => (
+    '<div class="stop-item' + (i === 0 ? ' selected' : '') + '" data-city="' + s.city + '" onclick="renderCity(\'' + tripName.replace(/'/g, "\\'") + '\',\'' + s.city.replace(/'/g, "\\'") + '\')" style="border-left:3px solid ' + s.color + '">' +
+      '<div style="font-weight:700;">' + s.flag + ' ' + s.city + '</div>' +
+      '<div style="font-size:.75rem;color:var(--muted);margin-top:2px;">' + s.dates + ' · ' + s.nights + '</div>' +
+      '<div style="font-size:.7rem;color:var(--muted);margin-top:2px;">' + s.actCount + '</div>' +
+    '</div>'
+  )).join('');
+
+  const first = trip.stops[0];
+  if (first) renderCity(tripName, first.city);
+
+  document.getElementById('trips').classList.remove('active');
+  document.getElementById('builder').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function filterAct(chip, cat) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  if (!currentTrip || !currentCity) return;
+  const activities = TOURS[currentTrip].cities[currentCity].activities;
+  renderActivities(activities, cat);
+}
+
+function filterTrips(query) {
+  const q = query.trim().toLowerCase();
+  document.querySelectorAll('.trip-card').forEach(card => {
+    const name = (card.dataset.name || '').toLowerCase();
+    const statusOk = !card.dataset.statusFilter || card.dataset.statusFilter === 'all' || card.classList.contains('status-match');
+    card.classList.toggle('hidden', (q.length > 0 && !name.includes(q)) || !statusOk);
+  });
+}
+
+function filterStatus(tab, status) {
+  document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.querySelectorAll('.trip-card').forEach(card => {
+    const badge = card.querySelector('.trip-badge');
+    const matches = status === 'all' || (badge && badge.classList.contains(status));
+    card.dataset.statusFilter = status;
+    card.classList.toggle('status-match', matches);
+    card.classList.toggle('hidden', !matches);
+  });
+}
+
+function duplicateCard(el, tripName) {
+  showToast('"' + tripName + '" duplicated as a new draft.', 'success');
+}
+
+function shareItinerary(tripName) {
+  showToast('Share link for "' + tripName + '" copied!', 'success');
+}
+</script>
+
+<script src="js/traveloop.js"></script>
+</body>
+</html>

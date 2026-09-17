@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traveloop – Plan Your Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #080c14;
+    --bg-card: #0e1420;
+    --bg-glass: rgba(255,255,255,0.04);
+    --bg-hover: rgba(255,255,255,0.07);
+    --accent-gold: #f0b429;
+    --accent-teal: #00d4aa;
+    --accent-coral: #ff6b6b;
+    --accent-blue: #4d9fff;
+    --accent-purple: #a78bfa;
+    --text-primary: #f0f4ff;
+    --text-secondary: #8892a4;
+    --text-muted: #4a5568;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(240,180,41,0.4);
+    --shadow-glow: 0 0 40px rgba(240,180,41,0.15);
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg-deep); color: var(--text-primary); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(77,159,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(0,212,170,0.04) 0%, transparent 60%);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 40px;
+    background: rgba(8,12,20,0.92); backdrop-filter: blur(22px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 11px; }
+  .nav-logo-img { width: 36px; height: 36px; border-radius: 10px; object-fit: cover; border: 1px solid rgba(240,180,41,0.3); }
+  .nav-logo { font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; background: linear-gradient(135deg,var(--accent-gold),#fff8e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-tabs { display: flex; gap: 4px; background: var(--bg-glass); border: 1px solid var(--border); border-radius: 50px; padding: 4px; }
+  .nav-tab { padding: 8px 20px; border-radius: 50px; border: none; background: transparent; color: var(--text-secondary); font-family: var(--font-body); font-size: 0.84rem; font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .nav-tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+  .nav-tab.active { background: var(--accent-gold); color: #1a1000; font-weight: 600; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: calc(100vh - 65px); padding: 40px; position: relative; z-index: 1; animation: screenIn 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  .screen.active { display: block; }
+  @keyframes screenIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  .section-header { margin-bottom: 34px; }
+  .section-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .section-eyebrow::before { content:''; display:inline-block; width:28px; height:1px; background:var(--accent-gold); }
+  .section-title { font-family: var(--font-display); font-size: clamp(2rem,4vw,3rem); font-weight: 900; line-height: 1.1; }
+  .section-title span { background: linear-gradient(135deg,var(--accent-gold),var(--accent-teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .section-sub { margin-top: 10px; color: var(--text-secondary); font-size: 0.95rem; max-width: 520px; }
+
+  /* ══════════════ SCREEN 8 – ACTIVITIES ══════════════ */
+  .search-wrapper { max-width: 700px; margin: 0 auto 28px; position: relative; }
+  .search-bar { width:100%; background:var(--bg-card); border:1.5px solid var(--border); border-radius:14px; padding:16px 52px 16px 52px; color:var(--text-primary); font-family:var(--font-body); font-size:1rem; outline:none; transition:all 0.3s; }
+  .search-bar::placeholder { color:var(--text-muted); }
+  .search-bar:focus { border-color:var(--accent-gold); box-shadow:0 0 0 3px rgba(240,180,41,0.1); }
+  .search-icon { position:absolute; left:17px; top:50%; transform:translateY(-50%); font-size:1.15rem; color:var(--text-muted); pointer-events:none; }
+  .search-clear { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:var(--bg-hover); border:none; color:var(--text-secondary); width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:0.78rem; display:none; align-items:center; justify-content:center; transition:all 0.2s; }
+  .search-clear:hover { background:var(--accent-coral); color:#fff; }
+  .search-bar:not(:placeholder-shown) ~ .search-clear { display:flex; }
+
+  .filter-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; align-items:center; }
+  .filter-label { font-size:0.74rem; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase; letter-spacing:1px; }
+  .chip { padding:6px 14px; border-radius:50px; border:1px solid var(--border); background:transparent; color:var(--text-secondary); font-family:var(--font-body); font-size:0.8rem; cursor:pointer; transition:all 0.22s; display:flex; align-items:center; gap:5px; }
+  .chip:hover { border-color:rgba(255,255,255,0.2); color:var(--text-primary); }
+  .chip.active { background:rgba(240,180,41,0.15); border-color:var(--accent-gold); color:var(--accent-gold); }
+
+  .activity-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+  .activity-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; overflow:hidden; transition:all 0.35s cubic-bezier(0.22,1,0.36,1); animation:cardReveal 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  .activity-card:hover { border-color:var(--border-hover); transform:translateY(-6px); box-shadow:0 20px 60px rgba(0,0,0,0.4),var(--shadow-glow); }
+  @keyframes cardReveal { from{opacity:0;transform:translateY(30px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+
+  .activity-img { height:190px; position:relative; overflow:hidden; }
+  .activity-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.5s; display:block; }
+  .activity-card:hover .activity-img img { transform:scale(1.08); }
+  .activity-img-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(8,12,20,0.92) 0%,transparent 55%); }
+
+  .activity-badge { position:absolute; top:12px; left:12px; padding:4px 10px; border-radius:50px; font-size:0.7rem; font-weight:600; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:1px; }
+  .badge-adventure { background:rgba(255,107,107,0.2); color:var(--accent-coral); border:1px solid rgba(255,107,107,0.3); }
+  .badge-culture   { background:rgba(167,139,250,0.2); color:var(--accent-purple); border:1px solid rgba(167,139,250,0.3); }
+  .badge-food      { background:rgba(240,180,41,0.2); color:var(--accent-gold); border:1px solid rgba(240,180,41,0.3); }
+  .badge-nature    { background:rgba(0,212,170,0.2); color:var(--accent-teal); border:1px solid rgba(0,212,170,0.3); }
+  .badge-wellness  { background:rgba(77,159,255,0.2); color:var(--accent-blue); border:1px solid rgba(77,159,255,0.3); }
+
+  .activity-rating { position:absolute; bottom:12px; right:12px; display:flex; align-items:center; gap:4px; font-size:0.8rem; color:var(--accent-gold); font-weight:600; }
+  .activity-body { padding:16px 18px; }
+  .activity-name { font-family:var(--font-display); font-size:1.1rem; font-weight:700; margin-bottom:5px; }
+  .activity-location { font-size:0.8rem; color:var(--text-secondary); display:flex; align-items:center; gap:4px; margin-bottom:10px; }
+  .activity-meta { display:flex; gap:14px; font-size:0.78rem; color:var(--text-muted); margin-bottom:14px; }
+  .activity-meta span { display:flex; align-items:center; gap:4px; }
+  .activity-footer { display:flex; align-items:center; justify-content:space-between; padding-top:12px; border-top:1px solid var(--border); }
+  .activity-price { font-family:var(--font-mono); font-size:1rem; font-weight:600; color:var(--accent-teal); }
+  .activity-price small { font-size:0.7rem; color:var(--text-muted); font-weight:400; }
+  .btn-add { padding:7px 16px; border-radius:50px; border:1.5px solid var(--accent-gold); background:transparent; color:var(--accent-gold); font-family:var(--font-body); font-size:0.8rem; font-weight:600; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; gap:5px; }
+  .btn-add:hover { background:var(--accent-gold); color:#1a1000; transform:scale(1.05); }
+  .btn-add.added { background:rgba(0,212,170,0.15); border-color:var(--accent-teal); color:var(--accent-teal); }
+
+  .no-results { text-align:center; padding:60px 20px; color:var(--text-muted); display:none; }
+  .no-results .icon { font-size:3rem; margin-bottom:16px; }
+
+  /* ══════════════ SCREEN 9 – BUDGET ══════════════ */
+  .budget-hero {
+    display:grid; grid-template-columns:1fr 300px;
+    background:var(--bg-card); border:1px solid var(--border); border-radius:20px;
+    margin-bottom:24px; overflow:hidden; position:relative;
+  }
+  @media(max-width:780px){ .budget-hero{ grid-template-columns:1fr; } }
+  .budget-hero-content { padding:32px 36px; position:relative; z-index:1; }
+  .budget-hero-img { position:relative; overflow:hidden; min-height:200px; }
+  .budget-hero-img img { width:100%; height:100%; object-fit:cover; opacity:0.5; display:block; }
+  .budget-hero-img::before { content:''; position:absolute; inset:0; z-index:1; background:linear-gradient(to right,var(--bg-card) 0%,transparent 55%); }
+
+  .budget-total-label { font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
+  .budget-total-amount { font-family:var(--font-display); font-size:clamp(2rem,5vw,3.6rem); font-weight:900; line-height:1; margin-bottom:4px; }
+  .budget-status { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:50px; font-size:0.76rem; font-weight:600; margin-top:10px; }
+  .status-ok   { background:rgba(0,212,170,0.15); color:var(--accent-teal); }
+  .status-warn { background:rgba(240,180,41,0.15); color:var(--accent-gold); }
+  .status-over { background:rgba(255,107,107,0.15); color:var(--accent-coral); }
+  .budget-pulse { display:inline-block; width:8px; height:8px; border-radius:50%; animation:pulse 1.5s infinite; }
+  .pulse-green { background:var(--accent-teal); }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.6)} }
+
+  .budget-meta-row { display:flex; gap:14px; margin-top:20px; flex-wrap:wrap; }
+  .budget-meta-item { flex:1; min-width:80px; background:var(--bg-glass); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+  .meta-value { font-family:var(--font-mono); font-size:1rem; font-weight:600; }
+  .meta-label { font-size:0.7rem; color:var(--text-muted); margin-top:2px; }
+
+  .budget-layout { display:grid; grid-template-columns:1fr 355px; gap:24px; }
+  @media(max-width:880px){ .budget-layout{ grid-template-columns:1fr; } }
+
+  .sub-label { font-family:var(--font-mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); margin-bottom:14px; }
+  .breakdown-list { display:flex; flex-direction:column; gap:11px; }
+  .breakdown-item { display:flex; align-items:center; gap:13px; padding:13px 15px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; transition:all 0.3s; animation:slideIn 0.4s ease both; cursor:pointer; }
+  .breakdown-item:hover { border-color:rgba(255,255,255,0.14); transform:translateX(4px); }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+  .breakdown-icon { width:42px; height:42px; border-radius:11px; overflow:hidden; flex-shrink:0; }
+  .breakdown-icon img { width:100%; height:100%; object-fit:cover; display:block; }
+  .breakdown-info { flex:1; }
+  .breakdown-name { font-size:0.87rem; font-weight:600; margin-bottom:6px; }
+  .breakdown-bar-track { height:5px; background:rgba(255,255,255,0.05); border-radius:10px; overflow:hidden; }
+  .breakdown-bar-fill { height:100%; border-radius:10px; transition:width 1s cubic-bezier(0.22,1,0.36,1); }
+  .breakdown-amount { font-family:var(--font-mono); font-size:0.88rem; font-weight:600; text-align:right; }
+  .breakdown-pct { font-size:0.7rem; color:var(--text-muted); text-align:right; margin-top:2px; }
+
+  .chart-container { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:26px; height:fit-content; }
+  .chart-title { font-family:var(--font-display); font-size:1rem; font-weight:700; margin-bottom:20px; }
+  .donut-wrapper { position:relative; width:180px; height:180px; margin:0 auto 20px; }
+  .donut-svg { width:100%; height:100%; transform:rotate(-90deg); }
+  .donut-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .donut-center-val { font-family:var(--font-mono); font-size:1.1rem; font-weight:600; }
+  .donut-center-label { font-size:0.66rem; color:var(--text-muted); margin-top:2px; }
+  .chart-legend { display:flex; flex-direction:column; gap:9px; }
+  .legend-item { display:flex; align-items:center; gap:10px; font-size:0.8rem; color:var(--text-secondary); }
+  .legend-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .legend-name { flex:1; }
+  .legend-val { font-family:var(--font-mono); font-size:0.78rem; font-weight:600; color:var(--text-primary); }
+
+  .day-alerts { margin-top:22px; }
+  .alerts-title { font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+  .alert-item { display:flex; align-items:center; gap:10px; padding:9px 13px; border-radius:10px; margin-bottom:7px; font-size:0.79rem; }
+  .alert-over { background:rgba(255,107,107,0.1); border:1px solid rgba(255,107,107,0.2); color:#ff9b9b; }
+  .alert-warn { background:rgba(240,180,41,0.1); border:1px solid rgba(240,180,41,0.2); color:#f5c842; }
+
+  /* ══════════════ SCREEN 10 – PACKING ══════════════ */
+  .packing-layout { display:grid; grid-template-columns:275px 1fr; gap:24px; align-items:start; }
+  @media(max-width:800px){ .packing-layout{ grid-template-columns:1fr; } }
+
+  .cat-sidebar { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:20px; position:sticky; top:74px; }
+  .cat-sidebar-title { font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:13px; }
+  .cat-btn { display:flex; align-items:center; gap:10px; width:100%; padding:9px 11px; border-radius:10px; border:none; background:transparent; color:var(--text-secondary); cursor:pointer; transition:all 0.2s; font-family:var(--font-body); font-size:0.85rem; text-align:left; margin-bottom:4px; }
+  .cat-btn-thumb { width:30px; height:30px; border-radius:7px; object-fit:cover; flex-shrink:0; opacity:0.65; transition:opacity 0.2s; display:block; }
+  .cat-btn:hover { background:var(--bg-hover); color:var(--text-primary); }
+  .cat-btn:hover .cat-btn-thumb { opacity:1; }
+  .cat-btn.active { background:rgba(240,180,41,0.12); color:var(--accent-gold); }
+  .cat-btn.active .cat-btn-thumb { opacity:1; box-shadow:0 0 0 2px var(--accent-gold); }
+  .cat-count { margin-left:auto; font-size:0.68rem; background:var(--bg-hover); padding:2px 7px; border-radius:50px; font-family:var(--font-mono); }
+
+  .pack-progress { margin-top:18px; padding-top:18px; border-top:1px solid var(--border); text-align:center; }
+  .progress-ring-wrap { position:relative; width:94px; height:94px; margin:0 auto 10px; }
+  .progress-ring-svg { width:100%; height:100%; transform:rotate(-90deg); }
+  .progress-ring-bg { fill:none; stroke:rgba(255,255,255,0.05); stroke-width:8; }
+  .progress-ring-fill { fill:none; stroke:var(--accent-teal); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 0.8s cubic-bezier(0.22,1,0.36,1); }
+  .progress-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .progress-pct { font-family:var(--font-mono); font-size:1.2rem; font-weight:600; color:var(--accent-teal); }
+  .progress-lbl { font-size:0.6rem; color:var(--text-muted); }
+
+  .checklist-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+  .checklist-title { font-family:var(--font-display); font-size:1.3rem; font-weight:700; }
+  .btn-primary { padding:9px 18px; border-radius:50px; border:none; background:var(--accent-gold); color:#1a1000; font-family:var(--font-body); font-size:0.84rem; font-weight:700; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; gap:6px; }
+  .btn-primary:hover { background:#f5c842; transform:scale(1.04); box-shadow:0 8px 24px rgba(240,180,41,0.3); }
+  .btn-ghost { padding:9px 15px; border-radius:50px; border:1px solid var(--border); background:transparent; color:var(--text-secondary); font-family:var(--font-body); font-size:0.82rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+  .btn-ghost:hover { border-color:rgba(255,255,255,0.2); color:var(--text-primary); }
+
+  .section-divider { font-family:var(--font-mono); font-size:0.67rem; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); margin:14px 0 8px 2px; display:flex; align-items:center; gap:8px; }
+  .section-divider img { width:17px; height:17px; object-fit:cover; border-radius:4px; opacity:0.65; }
+
+  .check-item { display:flex; align-items:center; gap:11px; padding:11px 14px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; margin-bottom:7px; transition:all 0.3s; animation:itemIn 0.3s ease both; cursor:pointer; user-select:none; }
+  @keyframes itemIn { from{opacity:0;transform:translateX(10px)} to{opacity:1;transform:translateX(0)} }
+  .check-item:hover { border-color:rgba(255,255,255,0.12); background:var(--bg-hover); }
+  .check-item.checked { background:rgba(0,212,170,0.05); border-color:rgba(0,212,170,0.2); }
+  .check-box { width:20px; height:20px; border-radius:6px; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.25s; font-size:0.8rem; }
+  .check-item.checked .check-box { background:var(--accent-teal); border-color:var(--accent-teal); }
+  .check-item-thumb { width:34px; height:34px; border-radius:8px; object-fit:cover; flex-shrink:0; opacity:0.82; transition:all 0.3s; display:block; }
+  .check-item.checked .check-item-thumb { opacity:0.35; filter:grayscale(1); }
+  .check-item-text { flex:1; font-size:0.88rem; transition:all 0.3s; }
+  .check-item.checked .check-item-text { text-decoration:line-through; color:var(--text-muted); }
+  .check-item-tag { font-size:0.68rem; padding:3px 7px; border-radius:50px; font-family:var(--font-mono); }
+  .tag-essential { background:rgba(255,107,107,0.12); color:var(--accent-coral); }
+  .tag-optional  { background:rgba(255,255,255,0.05); color:var(--text-muted); }
+  .check-item-delete { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem; padding:4px; border-radius:6px; transition:all 0.2s; opacity:0; }
+  .check-item:hover .check-item-delete { opacity:1; }
+  .check-item-delete:hover { background:rgba(255,107,107,0.15); color:var(--accent-coral); }
+
+  .add-item-form { display:none; padding:17px; background:var(--bg-card); border:1px solid var(--border-hover); border-radius:13px; margin-bottom:16px; animation:formDrop 0.3s ease both; }
+  @keyframes formDrop { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+  .add-item-form.show { display:block; }
+  .form-row { display:flex; gap:9px; flex-wrap:wrap; }
+  .form-input { flex:1; min-width:170px; padding:9px 13px; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; color:var(--text-primary); font-family:var(--font-body); font-size:0.87rem; outline:none; transition:border-color 0.2s; }
+  .form-input:focus { border-color:var(--accent-gold); }
+  .form-select { padding:9px 28px 9px 12px; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; color:var(--text-primary); font-family:var(--font-body); font-size:0.87rem; outline:none; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238892a4'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 9px center; }
+  .empty-state { text-align:center; padding:48px 20px; color:var(--text-muted); }
+  .empty-icon { font-size:2.4rem; margin-bottom:12px; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:26px; right:26px; padding:12px 20px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; font-size:0.84rem; color:var(--text-primary); display:flex; align-items:center; gap:10px; box-shadow:0 20px 60px rgba(0,0,0,0.5); z-index:999; transform:translateY(100px); opacity:0; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .flex{display:flex;} .gap-10{gap:10px;} .mt-22{margin-top:22px;}
+  ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--bg-hover);border-radius:10px;}
+</style>
+<link rel="stylesheet" href="css/traveloop.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <img class="nav-logo-img" src="https://picsum.photos/seed/traveloop/80/80" alt="Traveloop" crossorigin="anonymous">
+    <div class="nav-logo">Traveloop</div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchScreen('activities',this)">🎯 Activities</button>
+    <button class="nav-tab" onclick="switchScreen('budget',this)">💰 Budget</button>
+    <button class="nav-tab" onclick="switchScreen('packing',this)">🧳 Packing</button>
+  </div>
+</nav>
+
+<div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastMsg">Done!</span></div>
+
+<!-- ══════════ SCREEN 8 ══════════ -->
+<section class="screen active" id="screen-activities">
+  <div class="section-header">
+    <div class="section-eyebrow">Screen 08</div>
+    <h1 class="section-title">Discover <span>Activities</span></h1>
+    <p class="section-sub">Hand-picked experiences for every stop on your journey.</p>
+  </div>
+
+  <div class="search-wrapper">
+    <span class="search-icon">🔍</span>
+    <input class="search-bar" type="text" id="activitySearch" placeholder="Search activities, cities, experiences…" oninput="filterActivities()">
+    <button class="search-clear" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">Type</span>
+    <button class="chip active" onclick="toggleChip(this,'all')" data-filter="all">🌐 All</button>
+    <button class="chip" onclick="toggleChip(this,'adventure')" data-filter="adventure">🧗 Adventure</button>
+    <button class="chip" onclick="toggleChip(this,'culture')" data-filter="culture">🏛️ Culture</button>
+    <button class="chip" onclick="toggleChip(this,'food')" data-filter="food">🍜 Food</button>
+    <button class="chip" onclick="toggleChip(this,'nature')" data-filter="nature">🌿 Nature</button>
+    <button class="chip" onclick="toggleChip(this,'wellness')" data-filter="wellness">🧘 Wellness</button>
+  </div>
+  <div class="filter-row" style="margin-top:-14px">
+    <span class="filter-label">Duration</span>
+    <button class="chip" onclick="toggleDuration(this,'half')" data-dur="half">⏱ Half Day</button>
+    <button class="chip" onclick="toggleDuration(this,'full')" data-dur="full">📅 Full Day</button>
+    <button class="chip" onclick="toggleDuration(this,'multi')" data-dur="multi">📆 Multi Day</button>
+  </div>
+
+  <div class="activity-grid" id="activityGrid"></div>
+  <div class="no-results" id="noResults"><div class="icon">🗺️</div><div>No activities found.</div></div>
+</section>
+
+<!-- ══════════ SCREEN 9 ══════════ -->
+<section class="screen" id="screen-budget">
+  <div class="section-header">
+    <div class="section-eyebrow">Screen 09</div>
+    <h1 class="section-title">Trip <span>Budget</span></h1>
+    <p class="section-sub">Your complete financial picture — in Indian Rupees.</p>
+  </div>
+
+  <div class="budget-hero">
+    <div class="budget-hero-content">
+      <div class="budget-total-label">ESTIMATED TOTAL COST</div>
+      <div class="budget-total-amount">₹<span id="totalCost">0</span></div>
+      <div class="budget-status status-ok">
+        <span class="budget-pulse pulse-green"></span>
+        Within Budget — ₹28,000 remaining
+      </div>
+      <div class="budget-meta-row">
+        <div class="budget-meta-item"><div class="meta-value" id="avgPerDay">₹0</div><div class="meta-label">Avg / Day</div></div>
+        <div class="budget-meta-item"><div class="meta-value">12</div><div class="meta-label">Days</div></div>
+        <div class="budget-meta-item"><div class="meta-value">4</div><div class="meta-label">Cities</div></div>
+        <div class="budget-meta-item"><div class="meta-value" style="color:var(--accent-coral)">2</div><div class="meta-label">Over-budget Days</div></div>
+      </div>
+    </div>
+    <div class="budget-hero-img">
+      <img src="https://picsum.photos/seed/budget-hero/700/400" alt="Budget" crossorigin="anonymous">
+    </div>
+  </div>
+
+  <div class="budget-layout">
+    <div>
+      <div class="sub-label">Cost Breakdown</div>
+      <div class="breakdown-list" id="breakdownList"></div>
+      <div class="day-alerts mt-22">
+        <div class="alerts-title">⚠️ Budget Alerts</div>
+        <div class="alert-item alert-over">🔴 Day 3 (Tokyo) — ₹15,000 over your daily limit</div>
+        <div class="alert-item alert-over">🔴 Day 7 (Kyoto) — ₹7,900 over your daily limit</div>
+        <div class="alert-item alert-warn">🟡 Day 10 (Osaka) — ₹2,500 close to daily limit</div>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">Spend Distribution</div>
+      <div class="donut-wrapper">
+        <svg class="donut-svg" viewBox="0 0 120 120" id="donutSvg"></svg>
+        <div class="donut-center"><div class="donut-center-val">₹3.55L</div><div class="donut-center-label">Total</div></div>
+      </div>
+      <div class="chart-legend" id="chartLegend"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SCREEN 10 ══════════ -->
+<section class="screen" id="screen-packing">
+  <div class="section-header">
+    <div class="section-eyebrow">Screen 10</div>
+    <h1 class="section-title">Packing <span>Checklist</span></h1>
+    <p class="section-sub">Never forget what matters. Pack smart, travel light.</p>
+  </div>
+
+  <div class="packing-layout">
+    <div class="cat-sidebar">
+      <div class="cat-sidebar-title">Categories</div>
+      <button class="cat-btn active" onclick="filterCategory('all',this)">
+        <img class="cat-btn-thumb" src="https://picsum.photos/seed/cat-all/80/80" alt="all" crossorigin="anonymous"> All Items <span class="cat-count" id="countAll">0</span>
+      </button>
+      <button class="cat-btn" onclick="filterCategory('clothing',this)">
+        <img class="cat-btn-thumb" src="https://picsum.photos/seed/cat-clothing/80/80" alt="clothing" crossorigin="anonymous"> Clothing <span class="cat-count" id="countClothing">0</span>
+      </button>
+      <button class="cat-btn" onclick="filterCategory('documents',this)">
+        <img class="cat-btn-thumb" src="https://picsum.photos/seed/cat-docs/80/80" alt="docs" crossorigin="anonymous"> Documents <span class="cat-count" id="countDocuments">0</span>
+      </button>
+      <button class="cat-btn" onclick="filterCategory('electronics',this)">
+        <img class="cat-btn-thumb" src="https://picsum.photos/seed/cat-elec/80/80" alt="electronics" crossorigin="anonymous"> Electronics <span class="cat-count" id="countElectronics">0</span>
+      </button>
+      <button class="cat-btn" onclick="filterCategory('toiletries',this)">
+        <img class="cat-btn-thumb" src="https://picsum.photos/seed/cat-toil/80/80" alt="toiletries" crossorigin="anonymous"> Toiletries <span class="cat-count" id="countToiletries">0</span>
+      </button>
+      <button class="cat-btn" onclick="filterCategory('misc',this)">
+        <img class="cat-btn-thumb" src="https://picsum.photos/seed/cat-misc/80/80" alt="misc" crossorigin="anonymous"> Misc <span class="cat-count" id="countMisc">0</span>
+      </button>
+
+      <div class="pack-progress">
+        <div class="progress-ring-wrap">
+          <svg class="progress-ring-svg" viewBox="0 0 100 100">
+            <circle class="progress-ring-bg" cx="50" cy="50" r="40"/>
+            <circle class="progress-ring-fill" cx="50" cy="50" r="40" id="progressRing" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+          </svg>
+          <div class="progress-center">
+            <div class="progress-pct" id="progressPct">0%</div>
+            <div class="progress-lbl">Packed</div>
+          </div>
+        </div>
+        <div style="font-size:0.74rem;color:var(--text-muted)" id="progressSub">0 of 0 items</div>
+        <button class="btn-ghost" style="width:100%;margin-top:10px;justify-content:center" onclick="resetChecklist()">🔄 Reset All</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="checklist-header">
+        <div class="checklist-title" id="checklistTitle">All Items</div>
+        <div class="flex gap-10">
+          <button class="btn-ghost" onclick="toggleForm()">＋ Add Item</button>
+          <button class="btn-primary" onclick="packAll()">✅ Pack All</button>
+        </div>
+      </div>
+      <div class="add-item-form" id="addForm">
+        <div class="form-row">
+          <input class="form-input" type="text" id="newItemName" placeholder="Item name…">
+          <select class="form-select" id="newItemCat">
+            <option value="clothing">👕 Clothing</option>
+            <option value="documents">📄 Documents</option>
+            <option value="electronics">🔌 Electronics</option>
+            <option value="toiletries">🧴 Toiletries</option>
+            <option value="misc">🎒 Misc</option>
+          </select>
+          <select class="form-select" id="newItemTag">
+            <option value="essential">Essential</option>
+            <option value="optional">Optional</option>
+          </select>
+          <button class="btn-primary" onclick="addItem()">Add</button>
+        </div>
+      </div>
+      <div id="checklistBody"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ═══════════════════ DATA ═══════════════════
+const activities = [
+  { id:1,  name:"Rock Climbing Expedition",  location:"Interlaken, Switzerland", type:"adventure", duration:"full",  priceINR:7400,  rating:4.8, reviews:312,  img:"https://picsum.photos/seed/rock-climbing/600/400",  badge:"adventure" },
+  { id:2,  name:"Street Food Night Tour",    location:"Bangkok, Thailand",        type:"food",      duration:"half",  priceINR:2900,  rating:4.9, reviews:892,  img:"https://picsum.photos/seed/street-food/600/400",  badge:"food" },
+  { id:3,  name:"Kyoto Temple Walk",         location:"Kyoto, Japan",             type:"culture",   duration:"full",  priceINR:3500,  rating:4.7, reviews:1204, img:"https://picsum.photos/seed/kyoto-temple/600/400",  badge:"culture" },
+  { id:4,  name:"Amazon Rainforest Trek",    location:"Manaus, Brazil",           type:"nature",    duration:"multi", priceINR:18400, rating:4.9, reviews:187,  img:"https://picsum.photos/seed/rainforest/600/400",  badge:"nature" },
+  { id:5,  name:"Himalayan Yoga Retreat",    location:"Rishikesh, India",         type:"wellness",  duration:"multi", priceINR:15000, rating:4.8, reviews:403,  img:"https://picsum.photos/seed/yoga-retreat/600/400",  badge:"wellness" },
+  { id:6,  name:"Colosseum VIP Night Tour",  location:"Rome, Italy",              type:"culture",   duration:"half",  priceINR:5400,  rating:4.6, reviews:756,  img:"https://picsum.photos/seed/colosseum/600/400",  badge:"culture" },
+  { id:7,  name:"Surfing Lessons",           location:"Bali, Indonesia",          type:"adventure", duration:"half",  priceINR:4000,  rating:4.7, reviews:634,  img:"https://picsum.photos/seed/surfing-bali/600/400",  badge:"adventure" },
+  { id:8,  name:"Vineyard & Wine Tasting",   location:"Bordeaux, France",         type:"food",      duration:"full",  priceINR:7900,  rating:4.9, reviews:289,  img:"https://picsum.photos/seed/vineyard/600/400",  badge:"food" },
+  { id:9,  name:"Northern Lights Hunt",      location:"Tromsø, Norway",           type:"nature",    duration:"full",  priceINR:11700, rating:4.8, reviews:521,  img:"https://picsum.photos/seed/northern-lights/600/400",  badge:"nature" },
+  { id:10, name:"Thermal Spa Day",           location:"Budapest, Hungary",        type:"wellness",  duration:"half",  priceINR:4600,  rating:4.6, reviews:918,  img:"https://picsum.photos/seed/thermal-spa/600/400",  badge:"wellness" },
+  { id:11, name:"Paragliding over Alps",     location:"Zermatt, Switzerland",     type:"adventure", duration:"half",  priceINR:14600, rating:4.9, reviews:243,  img:"https://picsum.photos/seed/paragliding/600/400",  badge:"adventure" },
+  { id:12, name:"Pasta Cooking Class",       location:"Florence, Italy",          type:"food",      duration:"half",  priceINR:6000,  rating:4.8, reviews:467,  img:"https://picsum.photos/seed/pasta-class/600/400",  badge:"food" },
+];
+
+const budgetItems = [
+  { name:"Transport",       img:"https://picsum.photos/seed/transport/80/80",      color:"#4d9fff", amount:99600,  pct:28 },
+  { name:"Accommodation",   img:"https://picsum.photos/seed/accommodation/80/80",  color:"#a78bfa", amount:119520, pct:34 },
+  { name:"Activities",      img:"https://picsum.photos/seed/activities-b/80/80",   color:"#f0b429", amount:56440,  pct:16 },
+  { name:"Meals",           img:"https://picsum.photos/seed/meals/80/80",          color:"#00d4aa", amount:59760,  pct:17 },
+  { name:"Shopping & Misc", img:"https://picsum.photos/seed/shopping/80/80",       color:"#ff6b6b", amount:18260,  pct:5  },
+];
+
+const itemImages = {
+  passport:   "https://picsum.photos/seed/passport/80/80",
+  insurance:  "https://picsum.photos/seed/insurance/80/80",
+  visa:       "https://picsum.photos/seed/visa-doc/80/80",
+  ticket:     "https://picsum.photos/seed/flight-ticket/80/80",
+  tshirt:     "https://picsum.photos/seed/tshirt/80/80",
+  pants:      "https://picsum.photos/seed/pants/80/80",
+  jacket:     "https://picsum.photos/seed/jacket/80/80",
+  shoes:      "https://picsum.photos/seed/shoes/80/80",
+  swimwear:   "https://picsum.photos/seed/swimwear/80/80",
+  laptop:     "https://picsum.photos/seed/laptop/80/80",
+  charger:    "https://picsum.photos/seed/charger/80/80",
+  adapter:    "https://picsum.photos/seed/adapter/80/80",
+  powerbank:  "https://picsum.photos/seed/powerbank/80/80",
+  earphones:  "https://picsum.photos/seed/earphones/80/80",
+  toothbrush: "https://picsum.photos/seed/toothbrush/80/80",
+  shampoo:    "https://picsum.photos/seed/shampoo/80/80",
+  sunscreen:  "https://picsum.photos/seed/sunscreen/80/80",
+  deodorant:  "https://picsum.photos/seed/deodorant/80/80",
+  sanitizer:  "https://picsum.photos/seed/sanitizer/80/80",
+  bottle:     "https://picsum.photos/seed/water-bottle/80/80",
+  pillow:     "https://picsum.photos/seed/travel-pillow/80/80",
+};
+
+const catImages = {
+  clothing:    "https://picsum.photos/seed/cat-clothing/80/80",
+  documents:   "https://picsum.photos/seed/cat-docs/80/80",
+  electronics: "https://picsum.photos/seed/cat-elec/80/80",
+  toiletries:  "https://picsum.photos/seed/cat-toil/80/80",
+  misc:        "https://picsum.photos/seed/cat-misc/80/80",
+};
+
+const defaultPackingItems = [
+  { id:1,  name:"Passport",                cat:"documents",   tag:"essential", checked:false, imgKey:"passport" },
+  { id:2,  name:"Travel Insurance Card",   cat:"documents",   tag:"essential", checked:false, imgKey:"insurance" },
+  { id:3,  name:"Visa Documents",          cat:"documents",   tag:"essential", checked:false, imgKey:"visa" },
+  { id:4,  name:"Flight Tickets Printout", cat:"documents",   tag:"optional",  checked:false, imgKey:"ticket" },
+  { id:5,  name:"T-Shirts (7×)",           cat:"clothing",    tag:"essential", checked:false, imgKey:"tshirt" },
+  { id:6,  name:"Pants / Jeans",           cat:"clothing",    tag:"essential", checked:false, imgKey:"pants" },
+  { id:7,  name:"Jacket / Hoodie",         cat:"clothing",    tag:"essential", checked:false, imgKey:"jacket" },
+  { id:8,  name:"Walking Shoes",           cat:"clothing",    tag:"essential", checked:false, imgKey:"shoes" },
+  { id:9,  name:"Swimwear",                cat:"clothing",    tag:"optional",  checked:false, imgKey:"swimwear" },
+  { id:10, name:"Laptop",                  cat:"electronics", tag:"optional",  checked:false, imgKey:"laptop" },
+  { id:11, name:"Phone Charger",           cat:"electronics", tag:"essential", checked:false, imgKey:"charger" },
+  { id:12, name:"Universal Power Adapter", cat:"electronics", tag:"essential", checked:false, imgKey:"adapter" },
+  { id:13, name:"Power Bank",              cat:"electronics", tag:"essential", checked:false, imgKey:"powerbank" },
+  { id:14, name:"Earphones / AirPods",     cat:"electronics", tag:"optional",  checked:false, imgKey:"earphones" },
+  { id:15, name:"Toothbrush & Paste",      cat:"toiletries",  tag:"essential", checked:false, imgKey:"toothbrush" },
+  { id:16, name:"Shampoo & Conditioner",   cat:"toiletries",  tag:"essential", checked:false, imgKey:"shampoo" },
+  { id:17, name:"Sunscreen SPF 50",        cat:"toiletries",  tag:"essential", checked:false, imgKey:"sunscreen" },
+  { id:18, name:"Deodorant",               cat:"toiletries",  tag:"essential", checked:false, imgKey:"deodorant" },
+  { id:19, name:"Hand Sanitizer",          cat:"misc",        tag:"essential", checked:false, imgKey:"sanitizer" },
+  { id:20, name:"Reusable Water Bottle",   cat:"misc",        tag:"optional",  checked:false, imgKey:"bottle" },
+  { id:21, name:"Travel Pillow",           cat:"misc",        tag:"optional",  checked:false, imgKey:"pillow" },
+];
+
+// ═══════════════════ STATE ═══════════════════
+let currentFilter='all', currentDuration='all', searchQuery='';
+let addedActivities=new Set();
+let packingItems=JSON.parse(JSON.stringify(defaultPackingItems));
+let nextId=100, currentCategory='all', showForm=false;
+
+// ═══════════════════ NAV ═══════════════════
+function switchScreen(name,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='budget') initBudget();
+  if(name==='packing') renderPacking();
+}
+
+// ═══════════════════ SCREEN 8 ═══════════════════
+function fmtINR(n){ return '₹'+n.toLocaleString('en-IN'); }
+
+function renderActivities(){
+  const grid=document.getElementById('activityGrid');
+  const noRes=document.getElementById('noResults');
+  const filtered=activities.filter(a=>{
+    const mT=currentFilter==='all'||a.type===currentFilter;
+    const mD=currentDuration==='all'||a.duration===currentDuration;
+    const mS=!searchQuery||a.name.toLowerCase().includes(searchQuery)||a.location.toLowerCase().includes(searchQuery);
+    return mT&&mD&&mS;
+  });
+  grid.innerHTML='';
+  if(!filtered.length){noRes.style.display='block';return;}
+  noRes.style.display='none';
+  filtered.forEach((a,i)=>{
+    const isAdded=addedActivities.has(a.id);
+    const card=document.createElement('div');
+    card.className='activity-card';
+    card.style.animationDelay=(i*0.06)+'s';
+    card.innerHTML=`
+      <div class="activity-img">
+        <img src="${a.img}" alt="${a.name}" loading="lazy" crossorigin="anonymous">
+        <div class="activity-img-overlay"></div>
+        <span class="activity-badge badge-${a.badge}">${a.badge}</span>
+        <div class="activity-rating">★ ${a.rating} <span style="color:var(--text-muted);font-weight:400">(${a.reviews})</span></div>
+      </div>
+      <div class="activity-body">
+        <div class="activity-name">${a.name}</div>
+        <div class="activity-location">📍 ${a.location}</div>
+        <div class="activity-meta">
+          <span>⏱ ${a.duration==='half'?'Half Day':a.duration==='full'?'Full Day':'Multi Day'}</span>
+          <span>👤 Per person</span>
+        </div>
+        <div class="activity-footer">
+          <div class="activity-price">${fmtINR(a.priceINR)}<small>/person</small></div>
+          <button class="btn-add ${isAdded?'added':''}" onclick="toggleActivity(${a.id},this)">${isAdded?'✓ Added':'＋ Add'}</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function toggleActivity(id,btn){
+  if(addedActivities.has(id)){addedActivities.delete(id);btn.className='btn-add';btn.textContent='＋ Add';showToast('🗑️','Activity removed');}
+  else{addedActivities.add(id);btn.className='btn-add added';btn.textContent='✓ Added';showToast('✅','Activity added to your trip!');}
+}
+function toggleChip(el,filter){document.querySelectorAll('[data-filter]').forEach(c=>c.classList.remove('active'));el.classList.add('active');currentFilter=filter;renderActivities();}
+function toggleDuration(el,dur){if(el.classList.contains('active')){el.classList.remove('active');currentDuration='all';}else{document.querySelectorAll('[data-dur]').forEach(c=>c.classList.remove('active'));el.classList.add('active');currentDuration=dur;}renderActivities();}
+function filterActivities(){searchQuery=document.getElementById('activitySearch').value.toLowerCase();renderActivities();}
+function clearSearch(){document.getElementById('activitySearch').value='';searchQuery='';renderActivities();}
+
+// ═══════════════════ SCREEN 9 ═══════════════════
+function initBudget(){
+  animCount('totalCost',0,353580,1400,v=>v.toLocaleString('en-IN'));
+  animCount('avgPerDay',0,29465,1100,v=>'₹'+v.toLocaleString('en-IN'));
+
+  const list=document.getElementById('breakdownList');
+  list.innerHTML='';
+  budgetItems.forEach((b,i)=>{
+    const div=document.createElement('div');
+    div.className='breakdown-item';
+    div.style.animationDelay=(i*0.09)+'s';
+    div.innerHTML=`
+      <div class="breakdown-icon"><img src="${b.img}" alt="${b.name}" crossorigin="anonymous"></div>
+      <div class="breakdown-info">
+        <div class="breakdown-name">${b.name}</div>
+        <div class="breakdown-bar-track"><div class="breakdown-bar-fill" style="background:${b.color};width:0%" data-target="${b.pct}"></div></div>
+      </div>
+      <div>
+        <div class="breakdown-amount">${fmtINR(b.amount)}</div>
+        <div class="breakdown-pct">${b.pct}%</div>
+      </div>`;
+    list.appendChild(div);
+  });
+  setTimeout(()=>{document.querySelectorAll('.breakdown-bar-fill').forEach(bar=>bar.style.width=bar.dataset.target+'%');},200);
+  buildDonut();
+}
+
+function animCount(id,from,to,dur,fmt){
+  const el=document.getElementById(id);
+  const start=performance.now();
+  (function step(now){
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,4);
+    el.textContent=fmt(Math.round(from+(to-from)*ease));
+    if(p<1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+function buildDonut(){
+  const svg=document.getElementById('donutSvg');
+  const legend=document.getElementById('chartLegend');
+  svg.innerHTML='';legend.innerHTML='';
+  const cx=60,cy=60,r=48,circ=2*Math.PI*r,gap=2;
+  let offset=0;
+  budgetItems.forEach(b=>{
+    const dashArr=(b.pct/100)*circ-gap;
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',r);
+    c.setAttribute('fill','none');c.setAttribute('stroke',b.color);
+    c.setAttribute('stroke-width','14');c.setAttribute('stroke-linecap','round');
+    c.setAttribute('stroke-dasharray',`${dashArr} ${circ-dashArr}`);
+    c.setAttribute('stroke-dashoffset',-offset);
+    svg.appendChild(c);
+    offset+=(b.pct/100)*circ;
+    const li=document.createElement('div');
+    li.className='legend-item';
+    li.innerHTML=`<div class="legend-dot" style="background:${b.color}"></div><span class="legend-name">${b.name}</span><span class="legend-val">${fmtINR(b.amount)}</span>`;
+    legend.appendChild(li);
+  });
+}
+
+// ═══════════════════ SCREEN 10 ═══════════════════
+function renderPacking(){updateCounts();renderChecklistBody();updateProgress();}
+
+function updateCounts(){
+  ['all','clothing','documents','electronics','toiletries','misc'].forEach(cat=>{
+    const el=document.getElementById('count'+cat.charAt(0).toUpperCase()+cat.slice(1));
+    if(el) el.textContent=cat==='all'?packingItems.length:packingItems.filter(i=>i.cat===cat).length;
+  });
+}
+
+function renderChecklistBody(){
+  const body=document.getElementById('checklistBody');
+  body.innerHTML='';
+  const items=currentCategory==='all'?packingItems:packingItems.filter(i=>i.cat===currentCategory);
+  if(!items.length){body.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div>No items. Add your first one!</div></div>`;return;}
+  if(currentCategory==='all'){
+    const cats=['clothing','documents','electronics','toiletries','misc'];
+    const labels={clothing:'Clothing',documents:'Documents',electronics:'Electronics',toiletries:'Toiletries',misc:'Misc'};
+    cats.forEach(cat=>{
+      const catItems=packingItems.filter(i=>i.cat===cat);
+      if(!catItems.length) return;
+      const lbl=document.createElement('div');
+      lbl.className='section-divider';
+      lbl.innerHTML=`<img src="${catImages[cat]}" alt="${cat}" crossorigin="anonymous"> ${labels[cat]}`;
+      body.appendChild(lbl);
+      catItems.forEach((item,idx)=>body.appendChild(buildCheckItem(item,idx*0.04)));
+    });
+  } else {
+    items.forEach((item,idx)=>body.appendChild(buildCheckItem(item,idx*0.04)));
+  }
+}
+
+function buildCheckItem(item,delay){
+  const div=document.createElement('div');
+  div.className='check-item'+(item.checked?' checked':'');
+  div.style.animationDelay=delay+'s';
+  div.dataset.id=item.id;
+  div.onclick=()=>toggleItem(item.id);
+  const imgSrc=item.imgKey&&itemImages[item.imgKey]?itemImages[item.imgKey]:catImages[item.cat]||catImages.misc;
+  div.innerHTML=`
+    <div class="check-box">${item.checked?'✓':''}</div>
+    <img class="check-item-thumb" src="${imgSrc}" alt="${item.name}" crossorigin="anonymous">
+    <div class="check-item-text">${item.name}</div>
+    <span class="check-item-tag tag-${item.tag}">${item.tag}</span>
+    <button class="check-item-delete" onclick="event.stopPropagation();deleteItem(${item.id})">🗑</button>`;
+  return div;
+}
+
+function toggleItem(id){
+  const item=packingItems.find(i=>i.id===id);
+  if(item){item.checked=!item.checked;renderChecklistBody();updateProgress();updateCounts();}
+}
+function deleteItem(id){packingItems=packingItems.filter(i=>i.id!==id);renderPacking();showToast('🗑️','Item removed');}
+function addItem(){
+  const name=document.getElementById('newItemName').value.trim();
+  if(!name){document.getElementById('newItemName').focus();return;}
+  const cat=document.getElementById('newItemCat').value;
+  const tag=document.getElementById('newItemTag').value;
+  packingItems.push({id:++nextId,name,cat,tag,checked:false,imgKey:null});
+  document.getElementById('newItemName').value='';
+  renderPacking();showToast('✅',`"${name}" added`);
+}
+function filterCategory(cat,btn){
+  currentCategory=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels={all:'All Items',clothing:'Clothing',documents:'Documents',electronics:'Electronics',toiletries:'Toiletries',misc:'Misc'};
+  document.getElementById('checklistTitle').textContent=labels[cat]||cat;
+  renderChecklistBody();
+}
+function updateProgress(){
+  const total=packingItems.length,checked=packingItems.filter(i=>i.checked).length;
+  const pct=total?Math.round((checked/total)*100):0;
+  document.getElementById('progressRing').style.strokeDashoffset=251.2-(pct/100)*251.2;
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('progressSub').textContent=`${checked} of ${total} items`;
+}
+function packAll(){
+  (currentCategory==='all'?packingItems:packingItems.filter(i=>i.cat===currentCategory)).forEach(i=>i.checked=true);
+  renderChecklistBody();updateProgress();showToast('🎉','All items packed!');
+}
+function resetChecklist(){packingItems.forEach(i=>i.checked=false);renderChecklistBody();updateProgress();showToast('🔄','Checklist reset');}
+function toggleForm(){showForm=!showForm;document.getElementById('addForm').classList.toggle('show',showForm);if(showForm)document.getElementById('newItemName').focus();}
+
+// ═══════════════════ TOAST ═══════════════════
+let toastTimer=null;
+function showToast(icon,msg){
+  document.getElementById('toastIcon').textContent=icon;
+  document.getElementById('toastMsg').textContent=msg;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+renderActivities();
+</script>
+<script src="js/traveloop.js"></script>
+</body>
+</html>

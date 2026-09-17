@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Traveloop - 3D Travel Planner</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@500;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --bg:#050816;
+  --card:#0d1327;
+  --glass:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.1);
+  --gold:#ffd166;
+  --cyan:#7df9ff;
+  --pink:#ff5fd7;
+  --text:#f5ebc8;
+  --muted:#b7ae91;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:
+  radial-gradient(circle at top left, rgba(125,249,255,.14), transparent 25%),
+  radial-gradient(circle at top right, rgba(255,95,215,.14), transparent 25%),
+  linear-gradient(135deg,#040611,#081225,#090d1c);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:var(--gold);
+  border-radius:20px;
+}
+
+/* MAIN */
+
+.wrapper{
+  padding:25px;
+}
+
+.container{
+  max-width:1450px;
+  margin:auto;
+  border-radius:35px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  backdrop-filter:blur(20px);
+  box-shadow:0 20px 80px rgba(0,0,0,.45);
+}
+
+/* NAVBAR */
+
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:24px 30px;
+  border-bottom:1px solid var(--border);
+}
+
+.logo-box{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.logo{
+  width:55px;
+  height:55px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#7df9ff55,#ff5fd755);
+  font-size:26px;
+}
+
+.brand{
+  font-size:30px;
+  font-family:'Cinzel',serif;
+  font-weight:800;
+}
+
+.nav-links{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.nav-pill{
+  padding:10px 16px;
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  font-size:13px;
+}
+
+/* HERO */
+
+.hero{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:25px;
+  padding:30px;
+}
+
+.hero-left,
+.hero-right{
+  background:rgba(255,255,255,.04);
+  border-radius:30px;
+  border:1px solid var(--border);
+}
+
+/* LEFT */
+
+.hero-left{
+  padding:35px;
+}
+
+.hero-left h1{
+  font-size:68px;
+  line-height:1;
+  font-family:'Cinzel',serif;
+  margin-bottom:20px;
+}
+
+.gradient{
+  background:linear-gradient(90deg,#fff4b3,#f4c95d,#ffd977);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.subtitle{
+  color:var(--muted);
+  line-height:1.8;
+  margin-bottom:30px;
+  max-width:650px;
+}
+
+.search-box{
+  display:grid;
+  grid-template-columns:1.5fr .8fr .8fr auto;
+  gap:12px;
+}
+
+.search-box input,
+.search-box select,
+.search-box button{
+  padding:16px;
+  border:none;
+  border-radius:18px;
+  font-size:15px;
+}
+
+.search-box input,
+.search-box select{
+  background:rgba(255,255,255,.06);
+  color:white;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.search-box button{
+  background:linear-gradient(135deg,#ffe8a3,#f4c95d,#d8a83f);
+  font-weight:800;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.search-box button:hover{
+  transform:translateY(-3px);
+}
+
+/* STATS */
+
+.stats{
+  display:flex;
+  gap:15px;
+  margin-top:30px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  min-width:160px;
+  padding:18px;
+  border-radius:20px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+}
+
+.stat b{
+  display:block;
+  font-size:26px;
+  margin-bottom:6px;
+  color:var(--gold);
+}
+
+/* SCENIC */
+
+.hero-right{
+  position:relative;
+  overflow:hidden;
+  min-height:500px;
+  background:
+  linear-gradient(to top,#050816 0%,#1a2345 20%,#4a5f8f 45%,#ffb36b 75%,#fff4dc 100%);
+}
+
+.sun{
+  position:absolute;
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff7d6,#ffd166,#ff8a5c);
+  top:12%;
+  left:12%;
+  box-shadow:0 0 80px rgba(255,209,102,.5);
+}
+
+/* CLOUDS */
+
+.cloud{
+  position:absolute;
+  width:180px;
+  height:60px;
+  background:white;
+  border-radius:999px;
+  opacity:.9;
+}
+
+.cloud::before,
+.cloud::after{
+  content:"";
+  position:absolute;
+  background:white;
+  border-radius:50%;
+}
+
+.cloud::before{
+  width:70px;
+  height:70px;
+  top:-30px;
+  left:25px;
+}
+
+.cloud::after{
+  width:90px;
+  height:90px;
+  top:-40px;
+  right:20px;
+}
+
+.c1{
+  top:18%;
+  left:-10%;
+  animation:moveCloud 25s linear infinite;
+}
+
+.c2{
+  top:28%;
+  left:-20%;
+  transform:scale(.8);
+  animation:moveCloud 35s linear infinite;
+}
+
+@keyframes moveCloud{
+  0%{
+    transform:translateX(-100px);
+  }
+  100%{
+    transform:translateX(900px);
+  }
+}
+
+/* MOUNTAINS */
+
+.mountains{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:60%;
+}
+
+.mountain{
+  position:absolute;
+  bottom:0;
+  width:0;
+  height:0;
+  border-left:240px solid transparent;
+  border-right:240px solid transparent;
+  border-bottom:340px solid #2d3f63;
+}
+
+.m1{
+  left:-80px;
+}
+
+.m2{
+  left:180px;
+  border-bottom-color:#1f3150;
+}
+
+.m3{
+  right:-60px;
+  border-bottom-color:#334b70;
+}
+
+/* ROAD */
+
+.road{
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:55%;
+  height:180px;
+  background:#1c1f2b;
+  clip-path:polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.car{
+  position:absolute;
+  bottom:95px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:55px;
+  animation:bounce 3s infinite;
+}
+
+@keyframes bounce{
+  50%{
+    transform:translateX(-50%) translateY(-10px);
+  }
+}
+
+/* CONTENT */
+
+.content{
+  padding:0 30px 30px;
+}
+
+/* SECTION */
+
+.section-title{
+  margin-bottom:22px;
+}
+
+.section-title h2{
+  color:var(--gold);
+  margin-bottom:8px;
+}
+
+.section-title p{
+  color:var(--muted);
+}
+
+/* SLIDER */
+
+.slider-wrapper{
+  position:relative;
+}
+
+.cities-slider{
+  display:flex;
+  gap:22px;
+  overflow-x:auto;
+  scroll-behavior:smooth;
+  padding:10px 5px;
+}
+
+.cities-slider::-webkit-scrollbar{
+  display:none;
+}
+
+/* CITY CARD */
+
+.city{
+  min-width:360px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:28px;
+  overflow:hidden;
+  transition:.4s;
+  flex-shrink:0;
+}
+
+.city:hover{
+  transform:translateY(-10px) rotateX(5deg) rotateY(-5deg);
+}
+
+.city img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+}
+
+.city-content{
+  padding:20px;
+}
+
+.tag{
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  font-size:12px;
+  margin-bottom:15px;
+}
+
+.city h3{
+  font-size:32px;
+  margin-bottom:14px;
+}
+
+.meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.chip{
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.07);
+  font-size:12px;
+}
+
+.city p{
+  color:var(--muted);
+  line-height:1.7;
+  margin-bottom:18px;
+}
+
+.btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(135deg,#ff5fd7,#ff9de1);
+  color:white;
+  font-weight:800;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.btn:hover{
+  transform:scale(1.03);
+}
+
+/* SLIDE BUTTONS */
+
+.slide-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:52px;
+  height:52px;
+  border:none;
+  border-radius:50%;
+  background:rgba(0,0,0,.65);
+  color:white;
+  font-size:22px;
+  cursor:pointer;
+  z-index:20;
+}
+
+.slide-btn:hover{
+  background:var(--gold);
+  color:black;
+}
+
+.left{
+  left:-10px;
+}
+
+.right{
+  right:-10px;
+}
+
+/* ITINERARY */
+
+.trip-panel{
+  margin-top:40px;
+  background:rgba(255,255,255,.04);
+  border-radius:30px;
+  border:1px solid var(--border);
+  padding:25px;
+}
+
+.trip-list{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.trip-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px;
+  border-radius:20px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+}
+
+.trip-item strong{
+  color:var(--gold);
+  font-size:18px;
+}
+
+.trip-item span{
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+}
+
+.trip-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.trip-right em{
+  color:var(--gold);
+  font-style:normal;
+  font-weight:700;
+}
+
+.remove-btn{
+  border:none;
+  background:linear-gradient(135deg,#ff4d4d,#ff7676);
+  color:white;
+  padding:10px 16px;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+/* FOOTER */
+
+.footer{
+  padding:0 30px 30px;
+  color:#b6a87d;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+
+  .hero{
+    grid-template-columns:1fr;
+  }
+
+  .search-box{
+    grid-template-columns:1fr;
+  }
+
+}
+
+@media(max-width:700px){
+
+  .hero-left h1{
+    font-size:44px;
+  }
+
+  .city{
+    min-width:300px;
+  }
+
+}
+
+</style>
+<link rel="stylesheet" href="css/traveloop.css">
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="container">
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+<div class="logo-box">
+<div class="logo">✈</div>
+<div class="brand">Traveloop</div>
+</div>
+
+<div class="nav-links">
+<div class="nav-pill">Search</div>
+<div class="nav-pill">Trips</div>
+<div class="nav-pill">Scenic Routes</div>
+<div class="nav-pill">Planner</div>
+</div>
+
+</div>
+
+<!-- HERO -->
+
+<section class="hero">
+
+<div class="hero-left">
+
+<h1>
+Plan your trip with a
+<span class="gradient">beautiful flow</span>
+</h1>
+
+<p class="subtitle">
+A premium 3D travel planner with cinematic visuals,
+interactive city cards, smooth animations,
+and a modern itinerary experience.
+</p>
+
+<div class="search-box">
+
+<input type="text" placeholder="Search city or country">
+
+<select>
+<option>Budget</option>
+<option>Low</option>
+<option>Medium</option>
+<option>Luxury</option>
+</select>
+
+<select>
+<option>Popularity</option>
+<option>Trending</option>
+<option>Top Rated</option>
+</select>
+
+<button>Discover</button>
+
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<b>120+</b>
+<span>Cities to explore</span>
+</div>
+
+<div class="stat">
+<b>Live</b>
+<span>3D scenic animations</span>
+</div>
+
+<div class="stat">
+<b>∞</b>
+<span>Travel possibilities</span>
+</div>
+
+</div>
+
+</div>
+
+<!-- RIGHT -->
+
+<div class="hero-right">
+
+<div class="sun"></div>
+
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+
+<div class="mountains">
+<div class="mountain m1"></div>
+<div class="mountain m2"></div>
+<div class="mountain m3"></div>
+</div>
+
+<div class="road"></div>
+
+<div class="car">🚗</div>
+
+</div>
+
+</section>
+
+<!-- CONTENT -->
+
+<section class="content">
+
+<div class="section-title">
+<h2>Featured Cities</h2>
+<p>Slide through destinations and add them to your itinerary</p>
+</div>
+
+<div class="slider-wrapper">
+
+<button class="slide-btn left" id="leftBtn">❮</button>
+
+<div class="cities-slider" id="citiesSlider">
+
+<!-- TOKYO -->
+
+<div class="city">
+
+<img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1200&auto=format&fit=crop">
+
+<div class="city-content">
+
+<div class="tag">🇯🇵 Japan · Tokyo</div>
+
+<h3>Tokyo</h3>
+
+<div class="meta">
+<div class="chip">Luxury</div>
+<div class="chip">Anime</div>
+<div class="chip">Nightlife</div>
+</div>
+
+<p>
+Neon streets, sushi experiences,
+anime culture, and futuristic skylines.
+</p>
+
+<button class="btn add-btn"
+data-city="Tokyo"
+data-country="Japan">
+Add
+</button>
+
+</div>
+</div>
+
+<!-- PARIS -->
+
+<div class="city">
+
+<img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1200&auto=format&fit=crop">
+
+<div class="city-content">
+
+<div class="tag">🇫🇷 France · Paris</div>
+
+<h3>Paris</h3>
+
+<div class="meta">
+<div class="chip">Romantic</div>
+<div class="chip">Luxury</div>
+<div class="chip">Classic</div>
+</div>
+
+<p>
+Beautiful architecture, cafés,
+museums, and elegant city vibes.
+</p>
+
+<button class="btn add-btn"
+data-city="Paris"
+data-country="France">
+Add
+</button>
+
+</div>
+</div>
+
+<!-- DUBAI -->
+
+<div class="city">
+
+<img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1200&auto=format&fit=crop">
+
+<div class="city-content">
+
+<div class="tag">🇦🇪 UAE · Dubai</div>
+
+<h3>Dubai</h3>
+
+<div class="meta">
+<div class="chip">Luxury</div>
+<div class="chip">Desert</div>
+<div class="chip">Modern</div>
+</div>
+
+<p>
+Desert safari adventures,
+luxury hotels, and skyscraper views.
+</p>
+
+<button class="btn add-btn"
+data-city="Dubai"
+data-country="UAE">
+Add
+</button>
+
+</div>
+</div>
+
+<!-- GOA -->
+
+<div class="city">
+
+<img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop">
+
+<div class="city-content">
+
+<div class="tag">🇮🇳 India · Goa</div>
+
+<h3>Goa</h3>
+
+<div class="meta">
+<div class="chip">Beach</div>
+<div class="chip">Budget</div>
+<div class="chip">Party</div>
+</div>
+
+<p>
+Golden beaches, nightlife,
+seafood, and tropical sunsets.
+</p>
+
+<button class="btn add-btn"
+data-city="Goa"
+data-country="India">
+Add
+</button>
+
+</div>
+</div>
+
+<!-- NEW YORK -->
+
+<div class="city">
+
+<img src="https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?q=80&w=1200&auto=format&fit=crop">
+
+<div class="city-content">
+
+<div class="tag">🇺🇸 USA · New York</div>
+
+<h3>New York</h3>
+
+<div class="meta">
+<div class="chip">Urban</div>
+<div class="chip">Luxury</div>
+<div class="chip">Popular</div>
+</div>
+
+<p>
+Times Square, Central Park,
+Broadway, and skyline views.
+</p>
+
+<button class="btn add-btn"
+data-city="New York"
+data-country="USA">
+Add
+</button>
+
+</div>
+</div>
+
+</div>
+
+<button class="slide-btn right" id="rightBtn">❯</button>
+
+</div>
+
+<!-- ITINERARY -->
+
+<div class="trip-panel">
+
+<div class="section-title">
+<h2>Your Itinerary</h2>
+<p>Added cities will appear here</p>
+</div>
+
+<div class="trip-list" id="tripList">
+
+<div class="trip-item">
+
+<div>
+<strong>Bangkok</strong>
+<span>Thailand</span>
+</div>
+
+<div class="trip-right">
+<em>Added</em>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<div class="footer">
+Built for hackathons with premium UI, animations, scenic visuals, and 3D interactions.
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* SLIDER */
+
+const slider = document.getElementById("citiesSlider");
+
+document.getElementById("leftBtn").onclick = () => {
+  slider.scrollLeft -= 400;
+};
+
+document.getElementById("rightBtn").onclick = () => {
+  slider.scrollLeft += 400;
+};
+
+/* ADD TO ITINERARY */
+
+const addButtons = document.querySelectorAll(".add-btn");
+const tripList = document.getElementById("tripList");
+
+addButtons.forEach(button => {
+
+  button.addEventListener("click", () => {
+
+    const city = button.dataset.city;
+    const country = button.dataset.country;
+
+    /* PREVENT DUPLICATE */
+
+    const existingTrips =
+    document.querySelectorAll(".trip-item strong");
+
+    for(let trip of existingTrips){
+
+      if(trip.textContent === city){
+        return;
+      }
+
+    }
+
+    /* BUTTON CHANGE */
+
+    button.innerText = "Added ✓";
+
+    button.style.background =
+    "linear-gradient(135deg,#00d68f,#00b894)";
+
+    /* CREATE ITEM */
+
+    const tripItem = document.createElement("div");
+
+    tripItem.classList.add("trip-item");
+
+    tripItem.innerHTML = `
+
+      <div>
+        <strong>${city}</strong>
+        <span>${country}</span>
+      </div>
+
+      <div class="trip-right">
+
+        <em>Added</em>
+
+        <button class="remove-btn">
+          Delete
+        </button>
+
+      </div>
+
+    `;
+
+    tripList.appendChild(tripItem);
+
+    /* DELETE */
+
+    const removeBtn =
+    tripItem.querySelector(".remove-btn");
+
+    removeBtn.addEventListener("click", () => {
+
+      tripItem.remove();
+
+      button.innerText = "Add";
+
+      button.style.background =
+      "linear-gradient(135deg,#ff5fd7,#ff9de1)";
+
+    });
+
+  });
+
+});
+
+</script>
+
+<script src="js/traveloop.js"></script>
+</body>
+</html>
