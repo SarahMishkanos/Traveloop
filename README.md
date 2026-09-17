@@ -1,10 +1,10 @@
 # Traveloop
 
-**Traveloop** is a travel-planning web app — plan trips, build day-by-day itineraries, browse cities and activities, and keep a travel journal, all in one place.
+**Traveloop** is a travel-planning web app ,plan trips, build day-by-day itineraries, browse cities and activities, and keep a travel journal, all in one place.
 
 Originally built during a hackathon, this repo is the cleaned-up, unified version: one consistent design system across every page, a working guest/name flow, and no personal data left over from the original build.
 
-> **Current status:** front-end only. All trip/activity/journal data lives in the browser (hardcoded JS objects + `localStorage`) — there is no server or database yet. A real backend (Node/Express + PostgreSQL) is planned; see [Roadmap](#roadmap).
+> **Current status:** front-end only. All trip/activity/journal data lives in the browser (hardcoded JS objects + `localStorage`)  there is no server or database yet. A real backend (Node/Express + PostgreSQL) is planned; see [Roadmap](#roadmap).
 
 ##  What's inside
 
