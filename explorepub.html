@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>10 Days in Japan — Shared Itinerary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --sand:    #0a0e16;
+    --sand2:   #10141e;
+    --ink:     #f1efe6;
+    --ink2:    #9099ab;
+    --accent:  #e8b84a;
+    --accent2: #f3d179;
+    --teal:    #22d3bd;
+    --teal2:   #3fe0cc;
+    --card:    #161b28;
+    --border:  rgba(255,255,255,0.09);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--sand);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ─── HERO ─────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    height: 420px;
+    background: linear-gradient(160deg, #1A1410 0%, #2C1F16 40%, #1D6B5E 100%);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem 2.5rem 2.5rem;
+  }
+
+  #heroCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .hero-content { position: relative; z-index: 2; }
+
+  .trip-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(201,125,62,0.22);
+    border: 1px solid rgba(201,125,62,0.45);
+    color: #E8A96B;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(6px);
+  }
+
+  .trip-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(30px, 5vw, 44px);
+    color: #fff;
+    line-height: 1.05;
+    margin-bottom: 0.75rem;
+    max-width: 580px;
+  }
+
+  .trip-title em { color: var(--accent2); font-style: normal; }
+
+  .trip-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    align-items: center;
+  }
+
+  .trip-meta span {
+    color: rgba(255,255,255,0.60);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .trip-meta i { font-size: 14px; color: rgba(255,255,255,0.35); }
+
+  .author-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 1rem;
+  }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.20);
+    flex-shrink: 0;
+  }
+
+  .author-row span { color: rgba(255,255,255,0.65); font-size: 13px; }
+
+  /* ─── ACTION BAR ────────────────────────────────────── */
+  .action-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.9rem 2.5rem;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s, transform 0.12s;
+    flex-shrink: 0;
+  }
+
+  .btn-primary:hover  { background: #B36E31; transform: translateY(-1px); }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary i { font-size: 16px; }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink2);
+    padding: 8px 15px;
+    border-radius: 9px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .btn-ghost:hover { background: var(--sand); border-color: rgba(26,20,16,0.22); }
+  .btn-ghost i { font-size: 15px; }
+
+  .share-chips {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    align-items: center;
+  }
+
+  .chip {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--ink2);
+    font-size: 16px;
+  }
+
+  .chip:hover { transform: scale(1.12); background: var(--sand); }
+
+  /* ─── URL BAR ───────────────────────────────────────── */
+  .url-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.7rem 2.5rem;
+    background: var(--sand2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .url-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--ink2);
+    min-width: 0;
+  }
+
+  .url-pill i { font-size: 14px; color: var(--teal2); flex-shrink: 0; }
+  .url-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .copy-link {
+    font-size: 12px;
+    color: var(--teal);
+    cursor: pointer;
+    font-weight: 500;
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    user-select: none;
+  }
+
+  .copy-link:hover { background: rgba(29,107,94,0.08); }
+
+  /* ─── MAIN CONTENT ──────────────────────────────────── */
+  .main {
+    padding: 2rem 2.5rem;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--ink2);
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Read-only banner */
+  .read-only-banner {
+    background: rgba(201,125,62,0.06);
+    border: 1px solid rgba(201,125,62,0.22);
+    border-radius: 10px;
+    padding: 0.8rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink2);
+    margin-bottom: 2rem;
+  }
+
+  .read-only-banner i { color: var(--accent); font-size: 17px; flex-shrink: 0; }
+
+  /* Stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--ink2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Tags */
+  .tags-row {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--sand2);
+    color: var(--ink2);
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .tag i { font-size: 12px; }
+
+  /* Map placeholder */
+  .map-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    height: 210px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  #mapCanvas { width: 100%; height: 100%; display: block; }
+
+  /* Timeline */
+  .days-section { margin-bottom: 2rem; }
+
+  .day-block {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .day-spine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .day-dot {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .day-dot.accent { background: var(--accent); }
+
+  .day-line {
+    flex: 1;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--teal2), transparent);
+    margin-top: 5px;
+    min-height: 70px;
+  }
+
+  .day-content { flex: 1; padding-bottom: 0.5rem; }
+
+  .day-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 0.8rem;
+  }
+
+  .day-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px;
+    color: var(--ink);
+  }
+
+  .day-date { font-size: 12px; color: var(--ink2); }
+
+  .event-cards { display: flex; flex-direction: column; gap: 8px; }
+
+  .event-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    cursor: default;
+  }
+
+  .event-card:hover {
+    border-color: rgba(29,107,94,0.28);
+    box-shadow: 0 2px 10px rgba(29,107,94,0.08);
+  }
+
+  .event-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .icon-flight { background: #EAF3DE; color: #3B6D11; }
+  .icon-hotel  { background: #E6F1FB; color: #185FA5; }
+  .icon-food   { background: #FAEEDA; color: #854F0B; }
+  .icon-sight  { background: #FBEAF0; color: #993556; }
+  .icon-train  { background: #EEEDFE; color: #534AB7; }
+
+  .event-info { flex: 1; min-width: 0; }
+
+  .event-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .event-detail { font-size: 12px; color: var(--ink2); }
+
+  .event-time {
+    font-size: 12px;
+    color: var(--ink2);
+    flex-shrink: 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Like row */
+  .like-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--ink2);
+    padding: 7px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .like-btn:hover { color: var(--accent); border-color: var(--accent); background: rgba(201,125,62,0.06); }
+  .like-btn.liked { color: var(--accent); border-color: var(--accent); background: rgba(201,125,62,0.09); }
+  .like-btn i { font-size: 15px; }
+
+  .like-count { margin-left: auto; font-size: 12px; color: var(--ink2); }
+
+  /* CTA card */
+  .cta-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+
+  .cta-top {
+    padding: 1.5rem 1.75rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cta-top h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin-bottom: 0.4rem;
+    color: var(--ink);
+  }
+
+  .cta-top p { font-size: 13px; color: var(--ink2); line-height: 1.6; }
+
+  .cta-bottom {
+    padding: 1.5rem 1.75rem;
+    text-align: center;
+    background: var(--sand);
+  }
+
+  .btn-copy-big {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    color: #fff;
+    border: none;
+    padding: 14px 36px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 0.7rem;
+  }
+
+  .btn-copy-big:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(29,107,94,0.28);
+  }
+
+  .btn-copy-big:active { transform: scale(0.97); }
+  .btn-copy-big i { font-size: 19px; }
+
+  .copy-note { font-size: 12px; color: var(--ink2); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: #fff;
+    font-size: 13px;
+    padding: 10px 22px;
+    border-radius: 30px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── RESPONSIVE ────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .hero { padding: 1.5rem 1.25rem 2rem; }
+    .action-bar { padding: 0.8rem 1.25rem; }
+    .url-row { padding: 0.6rem 1.25rem; }
+    .main { padding: 1.5rem 1.25rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .share-chips .chip:nth-child(3) { display: none; }
+  }
+</style>
+<link rel="stylesheet" href="css/traveloop.css">
+</head>
+
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════ -->
+<section class="hero" aria-label="Trip hero banner">
+  <canvas id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="hero-content">
+    <div class="trip-badge">
+      <i class="ti ti-world" aria-hidden="true"></i>
+      Public Itinerary
+    </div>
+    <h1 class="trip-title">10 Days in <em>Japan</em></h1>
+    <div class="trip-meta">
+      <span><i class="ti ti-calendar" aria-hidden="true"></i> Aug 14 – Aug 24, 2025</span>
+      <span><i class="ti ti-map-pin" aria-hidden="true"></i> Tokyo · Kyoto · Osaka</span>
+      <span><i class="ti ti-users" aria-hidden="true"></i> 2 travellers</span>
+    </div>
+    <div class="author-row">
+      <div class="avatar" aria-hidden="true">MR</div>
+      <span>Curated by <strong>Maya Reyes</strong> &nbsp;·&nbsp; 3.2k views</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     ACTION BAR
+══════════════════════════════════════════════════════ -->
+<nav class="action-bar" aria-label="Itinerary actions">
+  <button class="btn-primary" onclick="handleCopyTrip()" aria-label="Copy this trip to your account">
+    <i class="ti ti-copy" aria-hidden="true"></i> Copy Trip
+  </button>
+  <button class="btn-ghost" onclick="handleBookmark(this)" aria-label="Save itinerary">
+    <i class="ti ti-bookmark" aria-hidden="true"></i> Save
+  </button>
+  <div class="share-chips" aria-label="Share options">
+    <button class="chip" title="Share on X" aria-label="Share on X" onclick="shareOn('X')">
+      <i class="ti ti-brand-x" aria-hidden="true"></i>
+    </button>
+    <button class="chip" title="Share on WhatsApp" aria-label="Share on WhatsApp" onclick="shareOn('WhatsApp')">
+      <i class="ti ti-brand-whatsapp" aria-hidden="true"></i>
+    </button>
+    <button class="chip" title="Share link" aria-label="Share link" onclick="shareOn('link')">
+      <i class="ti ti-share" aria-hidden="true"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     PUBLIC URL BAR
+══════════════════════════════════════════════════════ -->
+<div class="url-row" aria-label="Public URL">
+  <div class="url-pill">
+    <i class="ti ti-link" aria-hidden="true"></i>
+    <span class="url-text">tripwise.app/trip/japan-10days-sana-k4j2</span>
+  </div>
+  <span class="copy-link" role="button" tabindex="0" onclick="copyUrl(this)"
+        onkeydown="if(event.key==='Enter')copyUrl(this)">
+    <i class="ti ti-copy" style="font-size:13px;vertical-align:-2px;" aria-hidden="true"></i>
+    Copy link
+  </span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- Read-only notice -->
+  <div class="read-only-banner" role="status">
+    <i class="ti ti-eye" aria-hidden="true"></i>
+    <span>You're viewing a <strong>shared, read-only</strong> itinerary. Copy it to your account to edit or customise.</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" aria-label="Trip summary stats">
+    <div class="stat-card"><div class="stat-num">10</div><div class="stat-lbl">Days</div></div>
+    <div class="stat-card"><div class="stat-num">3</div><div class="stat-lbl">Cities</div></div>
+    <div class="stat-card"><div class="stat-num">24</div><div class="stat-lbl">Activities</div></div>
+    <div class="stat-card"><div class="stat-num">¥340k</div><div class="stat-lbl">Est. budget</div></div>
+  </div>
+
+  <!-- Tags -->
+  <div class="tags-row" aria-label="Trip tags">
+    <span class="tag"><i class="ti ti-torii" aria-hidden="true"></i> Culture</span>
+    <span class="tag"><i class="ti ti-bowl" aria-hidden="true"></i> Foodie</span>
+    <span class="tag"><i class="ti ti-tree" aria-hidden="true"></i> Nature</span>
+    <span class="tag"><i class="ti ti-train" aria-hidden="true"></i> Rail pass</span>
+    <span class="tag"><i class="ti ti-moon" aria-hidden="true"></i> Ryokan stay</span>
+    <span class="tag"><i class="ti ti-camera" aria-hidden="true"></i> Photography</span>
+  </div>
+
+  <!-- Map canvas -->
+  <div class="map-box" aria-label="Route map">
+    <canvas id="mapCanvas" aria-hidden="true"></canvas>
+  </div>
+
+  <!-- ── TIMELINE ── -->
+  <section class="days-section" aria-label="Day-by-day itinerary">
+    <p class="section-label">Day-by-day itinerary</p>
+
+    <!-- Day 1 -->
+    <div class="day-block">
+      <div class="day-spine">
+        <div class="day-dot" aria-hidden="true">D1</div>
+        <div class="day-line"></div>
+      </div>
+      <div class="day-content">
+        <div class="day-head">
+          <span class="day-name">Arrival — Tokyo</span>
+          <span class="day-date">Aug 14</span>
+        </div>
+        <div class="event-cards">
+          <div class="event-card">
+            <div class="event-icon icon-flight"><i class="ti ti-plane-arrival" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Arrive at Narita Airport (NRT)</div>
+              <div class="event-detail">Flight AI 306 · Terminal 1</div>
+            </div>
+            <div class="event-time">14:30</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-train"><i class="ti ti-train" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Narita Express to Shinjuku</div>
+              <div class="event-detail">~80 min · ¥3,070</div>
+            </div>
+            <div class="event-time">15:20</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-hotel"><i class="ti ti-building" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Hotel Gracery Shinjuku</div>
+              <div class="event-detail">Check-in · Godzilla-view room</div>
+            </div>
+            <div class="event-time">17:00</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-food"><i class="ti ti-bowl" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Dinner at Omoide Yokocho</div>
+              <div class="event-detail">Memory Lane yakitori alley</div>
+            </div>
+            <div class="event-time">19:30</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="day-block">
+      <div class="day-spine">
+        <div class="day-dot" aria-hidden="true">D2</div>
+        <div class="day-line"></div>
+      </div>
+      <div class="day-content">
+        <div class="day-head">
+          <span class="day-name">Tokyo Highlights</span>
+          <span class="day-date">Aug 15</span>
+        </div>
+        <div class="event-cards">
+          <div class="event-card">
+            <div class="event-icon icon-sight"><i class="ti ti-torii" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Senso-ji Temple, Asakusa</div>
+              <div class="event-detail">Early morning visit — beat the crowds</div>
+            </div>
+            <div class="event-time">07:30</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-sight"><i class="ti ti-building-skyscraper" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">teamLab Planets Immersive Art</div>
+              <div class="event-detail">Pre-book tickets · 90 min experience</div>
+            </div>
+            <div class="event-time">14:00</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-food"><i class="ti ti-fish" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Sushi Saito — Kaiseki dinner</div>
+              <div class="event-detail">Reservation required · ¥18,000 / person</div>
+            </div>
+            <div class="event-time">19:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 3 -->
+    <div class="day-block">
+      <div class="day-spine">
+        <div class="day-dot" aria-hidden="true">D3</div>
+        <div class="day-line"></div>
+      </div>
+      <div class="day-content">
+        <div class="day-head">
+          <span class="day-name">Day Trip — Mt. Fuji</span>
+          <span class="day-date">Aug 16</span>
+        </div>
+        <div class="event-cards">
+          <div class="event-card">
+            <div class="event-icon icon-train"><i class="ti ti-train" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Shinjuku → Kawaguchiko by express bus</div>
+              <div class="event-detail">~2 hr · ¥1,800 · departs 07:05</div>
+            </div>
+            <div class="event-time">07:00</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-sight"><i class="ti ti-mountain" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Chureito Pagoda viewpoint</div>
+              <div class="event-detail">Iconic pagoda-Fuji framing · 398 steps</div>
+            </div>
+            <div class="event-time">10:30</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-food"><i class="ti ti-bowl" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Lunch — Hoto Fudo (Fuji noodles)</div>
+              <div class="event-detail">Signature hoto udon · lakeside location</div>
+            </div>
+            <div class="event-time">13:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 5 — accent colour -->
+    <div class="day-block">
+      <div class="day-spine">
+        <div class="day-dot accent" aria-hidden="true">D5</div>
+      </div>
+      <div class="day-content">
+        <div class="day-head">
+          <span class="day-name">Travel to Kyoto</span>
+          <span class="day-date">Aug 18</span>
+        </div>
+        <div class="event-cards">
+          <div class="event-card">
+            <div class="event-icon icon-train"><i class="ti ti-train" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Shinkansen Tokyo → Kyoto</div>
+              <div class="event-detail">Nozomi 19 · 2h 15 min · JR Pass covered</div>
+            </div>
+            <div class="event-time">09:03</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-hotel"><i class="ti ti-home" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Hiiragiya Ryokan, Kyoto</div>
+              <div class="event-detail">Traditional inn · Tatami rooms · Kaiseki breakfast</div>
+            </div>
+            <div class="event-time">12:30</div>
+          </div>
+          <div class="event-card">
+            <div class="event-icon icon-sight"><i class="ti ti-trees" aria-hidden="true"></i></div>
+            <div class="event-info">
+              <div class="event-name">Arashiyama Bamboo Grove</div>
+              <div class="event-detail">Early evening stroll · Tenryu-ji gardens</div>
+            </div>
+            <div class="event-time">16:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Like / comment row -->
+  <div class="like-row">
+    <button class="like-btn" id="likeBtn" onclick="toggleLike()" aria-pressed="false">
+      <i class="ti ti-heart" aria-hidden="true"></i>
+      <span id="likeTxt">Inspire me too</span>
+    </button>
+    <button class="like-btn" onclick="showToast('Comments coming soon!')">
+      <i class="ti ti-message" aria-hidden="true"></i>
+      Comment
+    </button>
+    <span class="like-count" id="likeCount">142 people loved this trip</span>
+  </div>
+
+  <!-- CTA card -->
+  <div class="cta-card">
+    <div class="cta-top">
+      <h2>Make this trip yours</h2>
+      <p>Copy to your account and customise every detail — flights, hotels, activities, and budget. Takes 10 seconds.</p>
+    </div>
+    <div class="cta-bottom">
+      <button class="btn-copy-big" onclick="handleCopyTrip()">
+        <i class="ti ti-copy" aria-hidden="true"></i>
+        Copy this trip to my account
+      </button>
+      <div class="copy-note">Free to copy &nbsp;·&nbsp; No account needed to view</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <i class="ti ti-check" aria-hidden="true"></i>
+  <span id="toastMsg">Copied!</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     THREE.JS (hero 3D scene)
+══════════════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+/* ── HERO 3D SCENE ─────────────────────────────────────────── */
+(function () {
+  const canvas = document.getElementById('heroCanvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+  camera.position.set(0, 0, 5);
+
+  /* Particles — globe-ish cloud */
+  const count = 1400;
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi   = Math.acos(2 * Math.random() - 1);
+    const r     = 2.2 + (Math.random() - 0.5) * 1.4;
+    positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i * 3 + 2] = r * Math.cos(phi);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({ color: 0xE8A96B, size: 0.028, transparent: true, opacity: 0.55 });
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  /* Wireframe sphere */
+  const sphereGeo = new THREE.SphereGeometry(2.2, 18, 12);
+  const sphereMat = new THREE.MeshBasicMaterial({
+    color: 0x2A9080, wireframe: true, transparent: true, opacity: 0.10
+  });
+  const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+  scene.add(sphere);
+
+  /* Glowing core */
+  const coreGeo = new THREE.SphereGeometry(0.35, 32, 32);
+  const coreMat = new THREE.MeshBasicMaterial({ color: 0xC97D3E, transparent: true, opacity: 0.65 });
+  const core    = new THREE.Mesh(coreGeo, coreMat);
+  scene.add(core);
+
+  /* Orbiting rings */
+  function addRing(r, tilt, col) {
+    const rg = new THREE.TorusGeometry(r, 0.006, 8, 80);
+    const rm = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.28 });
+    const mesh = new THREE.Mesh(rg, rm);
+    mesh.rotation.x = tilt;
+    scene.add(mesh);
+    return mesh;
+  }
+  const ring1 = addRing(1.5, 0.5,  0x1D6B5E);
+  const ring2 = addRing(1.9, -0.8, 0xC97D3E);
+  const ring3 = addRing(2.3, 1.2,  0x2A9080);
+
+  /* Resize */
+  function resize() {
+    const w = canvas.parentElement.clientWidth;
+    const h = canvas.parentElement.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  /* Mouse parallax */
+  let mx = 0, my = 0;
+  document.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth  - 0.5) * 0.6;
+    my = (e.clientY / window.innerHeight - 0.5) * 0.3;
+  });
+
+  /* Animate */
+  let t = 0;
+  (function animate() {
+    requestAnimationFrame(animate);
+    t += 0.006;
+    points.rotation.y = t * 0.12 + mx * 0.4;
+    points.rotation.x = my * 0.3;
+    sphere.rotation.y = t * 0.08;
+    ring1.rotation.z  = t * 0.22;
+    ring2.rotation.z  = -t * 0.14;
+    ring3.rotation.y  = t * 0.10;
+    core.scale.setScalar(1 + 0.06 * Math.sin(t * 2));
+    renderer.render(scene, camera);
+  })();
+})();
+
+
+/* ── MAP CANVAS ────────────────────────────────────────────── */
+(function () {
+  const canvas = document.getElementById('mapCanvas');
+  const ctx    = canvas.getContext('2d');
+
+  function draw() {
+    const W = canvas.offsetWidth;
+    const H = canvas.offsetHeight;
+    canvas.width  = W * devicePixelRatio;
+    canvas.height = H * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+
+    /* Background */
+    ctx.fillStyle = '#F0EDE6';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Grid lines */
+    ctx.strokeStyle = 'rgba(26,20,16,0.06)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 28) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 28) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    /* City positions (relative) */
+    const cities = [
+      { label: 'Tokyo',  x: 0.70, y: 0.38, day: 'D1–D4',  col: '#1D6B5E' },
+      { label: 'Kyoto',  x: 0.42, y: 0.55, day: 'D5–D8',  col: '#C97D3E' },
+      { label: 'Osaka',  x: 0.38, y: 0.65, day: 'D9–D10', col: '#534AB7' },
+      { label: 'Fuji',   x: 0.60, y: 0.44, day: 'D3',     col: '#993556' },
+    ];
+
+    const pts = cities.map(c => ({ ...c, px: c.x * W, py: c.y * H }));
+
+    /* Route line */
+    ctx.beginPath();
+    ctx.setLineDash([6, 5]);
+    ctx.strokeStyle = 'rgba(29,107,94,0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.moveTo(pts[0].px, pts[0].py);
+    pts.slice(1).forEach(p => ctx.lineTo(p.px, p.py));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* Dots + labels */
+    pts.forEach(p => {
+      /* Halo */
+      ctx.beginPath();
+      ctx.arc(p.px, p.py, 12, 0, Math.PI * 2);
+      ctx.fillStyle = p.col + '22';
+      ctx.fill();
+      /* Dot */
+      ctx.beginPath();
+      ctx.arc(p.px, p.py, 6, 0, Math.PI * 2);
+      ctx.fillStyle = p.col;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      /* City label */
+      ctx.fillStyle = '#1A1410';
+      ctx.font = '500 12px DM Sans, sans-serif';
+      ctx.fillText(p.label, p.px + 10, p.py - 8);
+      /* Day badge */
+      ctx.fillStyle = p.col + 'BB';
+      const bw = ctx.measureText(p.day).width + 10;
+      roundRect(ctx, p.px + 10, p.py - 5, bw, 16, 4);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '400 10px DM Sans, sans-serif';
+      ctx.fillText(p.day, p.px + 15, p.py + 7);
+    });
+
+    /* "Japan map" label */
+    ctx.fillStyle = 'rgba(26,20,16,0.18)';
+    ctx.font = '500 11px DM Sans, sans-serif';
+    ctx.letterSpacing = '0.08em';
+    ctx.fillText('ROUTE MAP', 14, H - 12);
+  }
+
+  function roundRect(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.lineTo(x + w - r, y);
+    c.quadraticCurveTo(x + w, y, x + w, y + r);
+    c.lineTo(x + w, y + h - r);
+    c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    c.lineTo(x + r, y + h);
+    c.quadraticCurveTo(x, y + h, x, y + h - r);
+    c.lineTo(x, y + r);
+    c.quadraticCurveTo(x, y, x + r, y);
+    c.closePath();
+  }
+
+  draw();
+  window.addEventListener('resize', draw);
+})();
+
+
+/* ── UI INTERACTIONS ───────────────────────────────────────── */
+let liked     = false;
+let likeCount = 142;
+
+function toggleLike() {
+  liked = !liked;
+  likeCount += liked ? 1 : -1;
+  const btn  = document.getElementById('likeBtn');
+  const txt  = document.getElementById('likeTxt');
+  const cnt  = document.getElementById('likeCount');
+  btn.classList.toggle('liked', liked);
+  btn.setAttribute('aria-pressed', liked);
+  txt.textContent = liked ? 'Inspired!' : 'Inspire me too';
+  cnt.textContent = likeCount + ' people loved this trip';
+  if (liked) showToast('Added to your inspirations!');
+}
+
+let bookmarked = false;
+function handleBookmark(btn) {
+  bookmarked = !bookmarked;
+  btn.innerHTML = bookmarked
+    ? '<i class="ti ti-bookmark-filled" aria-hidden="true"></i> Saved'
+    : '<i class="ti ti-bookmark" aria-hidden="true"></i> Save';
+  showToast(bookmarked ? 'Saved to your collection!' : 'Removed from saved');
+}
+
+function handleCopyTrip() {
+  showToast('Trip copied to your account! ✈');
+}
+
+function shareOn(platform) {
+  const msgs = { X: 'Opening X…', WhatsApp: 'Opening WhatsApp…', link: 'Link copied!' };
+  showToast(msgs[platform] || 'Sharing…');
+}
+
+function copyUrl(el) {
+  const orig = el.innerHTML;
+  navigator.clipboard.writeText('https://tripwise.app/trip/japan-10days-sana-k4j2').catch(() => {});
+  el.innerHTML = '<i class="ti ti-check" style="font-size:13px;vertical-align:-2px;color:#1D6B5E" aria-hidden="true"></i> Copied!';
+  el.style.color = '#1D6B5E';
+  setTimeout(() => { el.innerHTML = orig; el.style.color = ''; }, 2200);
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t  = document.getElementById('toast');
+  const tm = document.getElementById('toastMsg');
+  tm.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+</script>
+
+<script src="js/traveloop.js"></script>
+</body>
+</html>
