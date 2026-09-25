@@ -2,7 +2,7 @@
 
 A travel-planning web app built in a hackathon sprint — plan trips, build day-by-day itineraries, explore cities and activities, and keep a travel journal, all in one place.
 
-## Live website - Directly click on this to see the website 
+## Live website - Directly click on this to see the website - https://sarahmishkanos.github.io/Traveloop/
 
 ## Features
 
